@@ -27,7 +27,6 @@ function Logo() {
 function App() {
   return (
     <main className="h-dvh flex flex-col items-center justify-center gap-8">
-      <p className="font-mono">Something good is coming...</p>
       <Logo />
     </main>
   );
