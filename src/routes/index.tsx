@@ -21,7 +21,14 @@ const LOGO_ASCII_ART = `
 `;
 
 function Logo() {
-  return <pre className="font-mono">{LOGO_ASCII_ART}</pre>;
+  return (
+    <pre
+      className="font-mono text-neutral-300 text-[8px] md:text-sm lg:text-base select-none"
+      title="Digital Queer Collective"
+    >
+      {LOGO_ASCII_ART}
+    </pre>
+  );
 }
 
 function App() {
