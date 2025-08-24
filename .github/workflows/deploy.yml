@@ -45,16 +45,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
 
-      - name: Trigger Dokploy Deployment
-        uses: dokploy/dokploy-action@v1
-        run: |
-          curl -X 'POST' \
-          'https://${{secrets.INFRA_HOST}}/api/trpc/application.deploy' \
-          -H 'accept: application/json' \
-          -H 'x-api-key: ${{secrets.INFRA_KEY}}' \
-          -H 'Content-Type: application/json' \
-          -d '{
-              "json":{
-                  "applicationId": "${{secrets.INFRA_APP_ID}}"
-              }
-          }'
+      - name: Dokploy Deployment
+        uses: benbristow/dokploy-deploy-action@0.0.1
+        with:
+          auth_token: ${{ secrets.INFRA_KEY }}
+          application_id: ${{ secrets.INFRA_APP_ID }}
+          dokploy_url: https://${{ secrets.INFRA_HOST }}
