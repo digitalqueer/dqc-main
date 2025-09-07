@@ -23,6 +23,13 @@ export const Route = createRootRoute({
         href: appCss,
       },
     ],
+    scripts: [
+      {
+        defer: true,
+        "data-domain": "dqc.dev",
+        src: "https://analytics.dqc.dev/js/script.js",
+      },
+    ],
   }),
 
   shellComponent: RootDocument,
