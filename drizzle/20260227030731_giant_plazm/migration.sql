@@ -1,0 +1,1 @@
+ALTER TABLE "contact_requests" ALTER COLUMN "communications_id" SET DATA TYPE varchar(36) USING "communications_id"::varchar(36);

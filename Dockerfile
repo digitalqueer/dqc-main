@@ -18,6 +18,7 @@ COPY . .
 
 # Build the application
 RUN npm run build
+RUN npm run migrate
 
 # Expose the port your app runs on (adjust if needed)
 EXPOSE 3000

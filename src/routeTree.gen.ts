@@ -8,70 +8,135 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createServerRootRoute } from '@tanstack/react-start/server'
-
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as HealthRouteImport } from './routes/health'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { ServerRoute as HealthServerRouteImport } from './routes/health'
+import { Route as ThoughtsIndexRouteImport } from './routes/thoughts/index'
+import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
+import { Route as ThoughtsSlugRouteImport } from './routes/thoughts/$slug'
+import { Route as ProjectsTfpRouteImport } from './routes/projects/tfp'
 
-const rootServerRouteImport = createServerRootRoute()
-
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HealthServerRoute = HealthServerRouteImport.update({
-  id: '/health',
-  path: '/health',
-  getParentRoute: () => rootServerRouteImport,
+const ThoughtsIndexRoute = ThoughtsIndexRouteImport.update({
+  id: '/thoughts/',
+  path: '/thoughts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ThoughtsSlugRoute = ThoughtsSlugRouteImport.update({
+  id: '/thoughts/$slug',
+  path: '/thoughts/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsTfpRoute = ProjectsTfpRouteImport.update({
+  id: '/projects/tfp',
+  path: '/projects/tfp',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/health': typeof HealthRoute
+  '/projects/tfp': typeof ProjectsTfpRoute
+  '/thoughts/$slug': typeof ThoughtsSlugRoute
+  '/projects/': typeof ProjectsIndexRoute
+  '/thoughts/': typeof ThoughtsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/health': typeof HealthRoute
+  '/projects/tfp': typeof ProjectsTfpRoute
+  '/thoughts/$slug': typeof ThoughtsSlugRoute
+  '/projects': typeof ProjectsIndexRoute
+  '/thoughts': typeof ThoughtsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/health': typeof HealthRoute
+  '/projects/tfp': typeof ProjectsTfpRoute
+  '/thoughts/$slug': typeof ThoughtsSlugRoute
+  '/projects/': typeof ProjectsIndexRoute
+  '/thoughts/': typeof ThoughtsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/health'
+    | '/projects/tfp'
+    | '/thoughts/$slug'
+    | '/projects/'
+    | '/thoughts/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/health'
+    | '/projects/tfp'
+    | '/thoughts/$slug'
+    | '/projects'
+    | '/thoughts'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/health'
+    | '/projects/tfp'
+    | '/thoughts/$slug'
+    | '/projects/'
+    | '/thoughts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-}
-export interface FileServerRoutesByFullPath {
-  '/health': typeof HealthServerRoute
-}
-export interface FileServerRoutesByTo {
-  '/health': typeof HealthServerRoute
-}
-export interface FileServerRoutesById {
-  __root__: typeof rootServerRouteImport
-  '/health': typeof HealthServerRoute
-}
-export interface FileServerRouteTypes {
-  fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/health'
-  fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/health'
-  id: '__root__' | '/health'
-  fileServerRoutesById: FileServerRoutesById
-}
-export interface RootServerRouteChildren {
-  HealthServerRoute: typeof HealthServerRoute
+  AboutRoute: typeof AboutRoute
+  HealthRoute: typeof HealthRoute
+  ProjectsTfpRoute: typeof ProjectsTfpRoute
+  ThoughtsSlugRoute: typeof ThoughtsSlugRoute
+  ProjectsIndexRoute: typeof ProjectsIndexRoute
+  ThoughtsIndexRoute: typeof ThoughtsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -79,29 +144,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-  }
-}
-declare module '@tanstack/react-start/server' {
-  interface ServerFileRoutesByPath {
-    '/health': {
-      id: '/health'
-      path: '/health'
-      fullPath: '/health'
-      preLoaderRoute: typeof HealthServerRouteImport
-      parentRoute: typeof rootServerRouteImport
+    '/thoughts/': {
+      id: '/thoughts/'
+      path: '/thoughts'
+      fullPath: '/thoughts/'
+      preLoaderRoute: typeof ThoughtsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/': {
+      id: '/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/thoughts/$slug': {
+      id: '/thoughts/$slug'
+      path: '/thoughts/$slug'
+      fullPath: '/thoughts/$slug'
+      preLoaderRoute: typeof ThoughtsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/tfp': {
+      id: '/projects/tfp'
+      path: '/projects/tfp'
+      fullPath: '/projects/tfp'
+      preLoaderRoute: typeof ProjectsTfpRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  HealthRoute: HealthRoute,
+  ProjectsTfpRoute: ProjectsTfpRoute,
+  ThoughtsSlugRoute: ThoughtsSlugRoute,
+  ProjectsIndexRoute: ProjectsIndexRoute,
+  ThoughtsIndexRoute: ThoughtsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-const rootServerRouteChildren: RootServerRouteChildren = {
-  HealthServerRoute: HealthServerRoute,
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
 }
-export const serverRouteTree = rootServerRouteImport
-  ._addFileChildren(rootServerRouteChildren)
-  ._addFileTypes<FileServerRouteTypes>()

@@ -1,0 +1,57 @@
+@import url("./nudica.css");
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+body {
+  font-family:
+    "Nudica", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.root {
+  isolation: isolate;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-transform: uppercase;
+}
+
+@layer utilities {
+  .leading-zero-list {
+    @apply list-none pl-0;
+    counter-reset: leading-zero-counter; /* reset counter to 0 */
+  }
+
+  .leading-zero-list > li {
+    @apply flex my-1; /* flex for alignment & spacing */
+    counter-increment: leading-zero-counter;
+  }
+
+  .leading-zero-list > li::before {
+    content: counter(leading-zero-counter, decimal-leading-zero) ":";
+    @apply inline-block mr-2 text-right;
+    width: 3ch; /* reserve enough width for padding/alignment */
+  }
+
+  a:focus-visible {
+      @apply outline-offset-2 outline-1 outline-white;
+  }
+}
+
+@theme {
+  /*"Nudica Mono",*/
+  --font-mono:
+    "Nudica Mono", source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
