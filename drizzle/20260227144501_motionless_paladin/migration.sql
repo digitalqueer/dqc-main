@@ -1,0 +1,2 @@
+ALTER TABLE "contact_requests" ADD COLUMN "createdAt" timestamp DEFAULT now() NOT NULL;--> statement-breakpoint
+ALTER TABLE "contact_requests" ALTER COLUMN "communications_id" SET DATA TYPE char(36) USING "communications_id"::char(36);
