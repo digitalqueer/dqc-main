@@ -1,8 +1,10 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   char,
   pgTable,
   text,
+  timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -18,7 +20,8 @@ export const contactRequestTable = pgTable("contact_requests", {
   email: varchar("email_address", { length: 255 }).notNull(),
   comment: text("comment").notNull(),
   communicationsConsent: boolean("communications_consent").default(false),
-  communicationsId: varchar("communications_id", { length: 36 }),
+  communicationsId: char("communications_id", { length: 36 }),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 export type InsertableContactRequest = typeof contactRequestTable.$inferInsert;
 export type SelectableContactRequest = typeof contactRequestTable.$inferSelect;
