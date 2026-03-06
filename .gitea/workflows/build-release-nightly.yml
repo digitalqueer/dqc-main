@@ -6,7 +6,7 @@ on:
     types: [opened, synchronize, reopened, closed]
 
 env:
-  REGISTRY: gitea.example.com
+  REGISTRY: https://gitea.dqc.dev
   IMAGE_NAME: ${{ gitea.repository_owner }}/${{ gitea.repository }}
 
 jobs:
