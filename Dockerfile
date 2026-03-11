@@ -17,6 +17,6 @@ COPY --from=builder /app ./
 
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "curl -fsS http://localhost:3000/health || exit 1" ]
+HEALTHCHECK CMD [ "curl -fsS http://localhost:8080/api/health || exit 1" ]
 
 CMD ["npm", "run", "start"]
