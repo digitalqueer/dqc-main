@@ -19,4 +19,4 @@ EXPOSE 3000
 
 HEALTHCHECK CMD [ "curl -fsS http://localhost:8080/api/health || exit 1" ]
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "start"]
