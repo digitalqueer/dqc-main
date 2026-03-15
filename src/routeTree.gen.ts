@@ -9,19 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as HealthRouteImport } from './routes/health'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ThoughtsIndexRouteImport } from './routes/thoughts/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as ThoughtsSlugRouteImport } from './routes/thoughts/$slug'
 import { Route as ProjectsTfpRouteImport } from './routes/projects/tfp'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 
-const HealthRoute = HealthRouteImport.update({
-  id: '/health',
-  path: '/health',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -52,11 +47,16 @@ const ProjectsTfpRoute = ProjectsTfpRouteImport.update({
   path: '/projects/tfp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/health': typeof HealthRoute
+  '/api/health': typeof ApiHealthRoute
   '/projects/tfp': typeof ProjectsTfpRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -65,7 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/health': typeof HealthRoute
+  '/api/health': typeof ApiHealthRoute
   '/projects/tfp': typeof ProjectsTfpRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
   '/projects': typeof ProjectsIndexRoute
@@ -75,7 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/health': typeof HealthRoute
+  '/api/health': typeof ApiHealthRoute
   '/projects/tfp': typeof ProjectsTfpRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -86,7 +86,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/health'
+    | '/api/health'
     | '/projects/tfp'
     | '/thoughts/$slug'
     | '/projects/'
@@ -95,7 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/health'
+    | '/api/health'
     | '/projects/tfp'
     | '/thoughts/$slug'
     | '/projects'
@@ -104,7 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
-    | '/health'
+    | '/api/health'
     | '/projects/tfp'
     | '/thoughts/$slug'
     | '/projects/'
@@ -114,7 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  HealthRoute: typeof HealthRoute
+  ApiHealthRoute: typeof ApiHealthRoute
   ProjectsTfpRoute: typeof ProjectsTfpRoute
   ThoughtsSlugRoute: typeof ThoughtsSlugRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
@@ -123,13 +123,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/health': {
-      id: '/health'
-      path: '/health'
-      fullPath: '/health'
-      preLoaderRoute: typeof HealthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -172,13 +165,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsTfpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  HealthRoute: HealthRoute,
+  ApiHealthRoute: ApiHealthRoute,
   ProjectsTfpRoute: ProjectsTfpRoute,
   ThoughtsSlugRoute: ThoughtsSlugRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,

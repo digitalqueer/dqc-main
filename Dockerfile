@@ -1,26 +1,22 @@
-# Use Node.js 20 LTS as the base image
-FROM node:22-alpine
+FROM node:24-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+COPY package.json package-lock.json* pnpm-lock.yaml* ./
+RUN npm install
 
-# Install dependencies
-RUN npm ci
-
-# Setup Environment
-ENV NODE_ENV=production
-
-# Copy the rest of the application code
 COPY . .
 
-# Build the application
 RUN npm run build
 
-# Expose the port your app runs on (adjust if needed)
+FROM node:24-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app ./
+
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "start"]
+HEALTHCHECK CMD [ "curl -fsS http://localhost:8080/api/health || exit 1" ]
+
+CMD ["npm", "run", "start"]
