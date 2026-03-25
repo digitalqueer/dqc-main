@@ -1,1 +1,0 @@
-ALTER TABLE "contact_requests" DROP CONSTRAINT "contact_requests_comment_key";

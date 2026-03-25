@@ -1,1 +1,0 @@
-ALTER TABLE "contact_requests" RENAME COLUMN "createdAt" TO "created_at";
