@@ -55,7 +55,7 @@ function App() {
           that center liberation, accessibility, and care.
         </p>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <ContactDialog>
             <Dialog.Action command="show-modal" className="text-white">
               <SendIcon strokeWidth={1.5} size={16} />
