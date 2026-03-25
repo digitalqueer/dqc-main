@@ -13,10 +13,18 @@ FROM node:24-alpine
 
 WORKDIR /app
 
+RUN apk add --no-cache curl
+
 COPY --from=builder /app ./
 
 EXPOSE 3000
 
-HEALTHCHECK CMD [ "curl -fsS http://localhost:8080/api/health || exit 1" ]
+HEALTHCHECK \
+    --interval=60s \
+    --timeout=30s \
+    --start-period=120s \
+    --retries=3 \
+    CMD [ "sh", "-c", "curl -fsS http://localhost:3000/api/health || exit 1" ]
 
-CMD ["npm", "run", "start"]
+
+CMD ["npm", "start"]
