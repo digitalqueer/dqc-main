@@ -24,6 +24,7 @@ HEALTHCHECK \
     --timeout=30s \
     --start-period=120s \
     --retries=3 \
-    CMD [ "curl -fsS http://localhost:3000/api/health || exit 1" ]
+    CMD [ "sh", "-c", "curl -fsS http://localhost:3000/api/health || exit 1" ]
+
 
 CMD ["npm", "start"]
