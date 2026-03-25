@@ -12,11 +12,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - dqc
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   dqc-site:
     image: library/dqc_main:local
     container_name: dqc-site
-    restart: always
     depends_on:
       - dqc-psql
     env_file: ".env"
