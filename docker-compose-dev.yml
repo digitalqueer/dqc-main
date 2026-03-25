@@ -10,7 +10,24 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dqc
+
+  dqc-site:
+    image: library/dqc_main:local
+    container_name: dqc-site
+    restart: always
+    depends_on:
+      - dqc-psql
+    env_file: ".env"
+    ports:
+      - "3000:3000"
+    networks:
+      - dqc
 
 volumes:
   postgres_data:
     driver: local
+
+networks:
+  dqc:

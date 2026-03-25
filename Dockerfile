@@ -13,6 +13,8 @@ FROM node:24-alpine
 
 WORKDIR /app
 
+RUN apk add --no-cache curl
+
 COPY --from=builder /app ./
 
 EXPOSE 3000

@@ -4,7 +4,12 @@ export const Route = createFileRoute("/api/health")({
   server: {
     handlers: {
       GET: async () => {
-        return new Response(JSON.stringify({ status: "OK" }), { status: 200 });
+        return new Response(JSON.stringify({ status: "OK" }), {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          status: 200,
+        });
       },
     },
   },
