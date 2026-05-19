@@ -1,0 +1,51 @@
+{
+  "name": "@dqc/data",
+  "version": "0.0.1",
+  "description": "",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "./database": {
+      "import": {
+        "default": "./dist/database.js",
+        "types": "./dist/database.d.ts"
+      }
+    },
+    "./schema": {
+      "import": {
+        "default": "./dist/schema.js",
+        "types": "./dist/schema.d.ts"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "format": "biome format",
+    "lint": "biome lint",
+    "check": "biome check",
+    "migrate": "npx drizzle-kit migrate",
+    "migrate:generate": "npx drizzle-kit generate",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@effect/sql-pg": "^0.52.1",
+    "@types/node": "^25.6.0",
+    "drizzle-orm": "^0.45.2",
+    "drizzle-zod": "^0.8.3",
+    "effect": "^3.21.0",
+    "pg": "^8.20.0",
+    "typescript": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "^0.31.10"
+  }
+}
