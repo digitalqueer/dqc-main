@@ -1,0 +1,858 @@
+{
+  "id": "ca6529a6-7bf2-4d1a-ba88-51478da438e8",
+  "prevId": "eb1411b7-e63d-451f-ab11-409d7e3e1daf",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.contact_requests": {
+      "name": "contact_requests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_address": {
+          "name": "email_address",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comment": {
+          "name": "comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "communications_consent": {
+          "name": "communications_consent",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "communications_id": {
+          "name": "communications_id",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "tfp.billCategories": {
+      "name": "billCategories",
+      "schema": "tfp",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "billId": {
+          "name": "billId",
+          "type": "varchar(17)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "billCategory",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "billCategories_billId_bills_id_fk": {
+          "name": "billCategories_billId_bills_id_fk",
+          "tableFrom": "billCategories",
+          "tableTo": "bills",
+          "schemaTo": "tfp",
+          "columnsFrom": [
+            "billId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "tfp.billRepRelations": {
+      "name": "billRepRelations",
+      "schema": "tfp",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "billId": {
+          "name": "billId",
+          "type": "varchar(17)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "repId": {
+          "name": "repId",
+          "type": "varchar(17)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "billRepRelation",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "billRepRelations_billId_bills_id_fk": {
+          "name": "billRepRelations_billId_bills_id_fk",
+          "tableFrom": "billRepRelations",
+          "tableTo": "bills",
+          "schemaTo": "tfp",
+          "columnsFrom": [
+            "billId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "billRepRelations_repId_representatives_id_fk": {
+          "name": "billRepRelations_repId_representatives_id_fk",
+          "tableFrom": "billRepRelations",
+          "tableTo": "representatives",
+          "schemaTo": "tfp",
+          "columnsFrom": [
+            "repId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "tfp.billVotes": {
+      "name": "billVotes",
+      "schema": "tfp",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "billId": {
+          "name": "billId",
+          "type": "varchar(17)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "repId": {
+          "name": "repId",
+          "type": "varchar(17)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vote": {
+          "name": "vote",
+          "type": "billVote",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "billVotes_billId_bills_id_fk": {
+          "name": "billVotes_billId_bills_id_fk",
+          "tableFrom": "billVotes",
+          "tableTo": "bills",
+          "schemaTo": "tfp",
+          "columnsFrom": [
+            "billId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "billVotes_repId_representatives_id_fk": {
+          "name": "billVotes_repId_representatives_id_fk",
+          "tableFrom": "billVotes",
+          "tableTo": "representatives",
+          "schemaTo": "tfp",
+          "columnsFrom": [
+            "repId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "tfp.bills": {
+      "name": "bills",
+      "schema": "tfp",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(17)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "caseName": {
+          "name": "caseName",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "billStatus",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "progress": {
+          "name": "progress",
+          "type": "billProgress",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "impact": {
+          "name": "impact",
+          "type": "billImpact",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "summary": {
+          "name": "summary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "level": {
+          "name": "level",
+          "type": "billLevel",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'State'"
+        },
+        "state": {
+          "name": "state",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "billInformationLink": {
+          "name": "billInformationLink",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "legiscanBillId": {
+          "name": "legiscanBillId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "yeaVoteCount": {
+          "name": "yeaVoteCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": -1
+        },
+        "nayVoteCount": {
+          "name": "nayVoteCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": -1
+        },
+        "lastActivityDate": {
+          "name": "lastActivityDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "introductionDate": {
+          "name": "introductionDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "airtableCreatedAt": {
+          "name": "airtableCreatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "airtableModifiedAt": {
+          "name": "airtableModifiedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "airtableData": {
+          "name": "airtableData",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "tfp.importLogs": {
+      "name": "importLogs",
+      "schema": "tfp",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "importLogStatusEnum",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'In Progress'"
+        },
+        "errorMessage": {
+          "name": "errorMessage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "tfp.importRecordLogs": {
+      "name": "importRecordLogs",
+      "schema": "tfp",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "logId": {
+          "name": "logId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recordId": {
+          "name": "recordId",
+          "type": "varchar(17)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "airtableId": {
+          "name": "airtableId",
+          "type": "varchar(17)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tableName": {
+          "name": "tableName",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "importData": {
+          "name": "importData",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentData": {
+          "name": "currentData",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jsonDiff": {
+          "name": "jsonDiff",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "importRecordLogs_logId_importLogs_id_fk": {
+          "name": "importRecordLogs_logId_importLogs_id_fk",
+          "tableFrom": "importRecordLogs",
+          "tableTo": "importLogs",
+          "schemaTo": "tfp",
+          "columnsFrom": [
+            "logId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "tfp.representatives": {
+      "name": "representatives",
+      "schema": "tfp",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(17)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "politicalParty": {
+          "name": "politicalParty",
+          "type": "politicalParty",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "district": {
+          "name": "district",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "representativeRole",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "level": {
+          "name": "level",
+          "type": "representativeLevel",
+          "typeSchema": "tfp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state": {
+          "name": "state",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reelectionDate": {
+          "name": "reelectionDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "legiscanId": {
+          "name": "legiscanId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "followTheMoneyId": {
+          "name": "followTheMoneyId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "facebook": {
+          "name": "facebook",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "twitter": {
+          "name": "twitter",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "website": {
+          "name": "website",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "capitolPhoneNumber": {
+          "name": "capitolPhoneNumber",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "districtPhoneNumber": {
+          "name": "districtPhoneNumber",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "capitolAddress": {
+          "name": "capitolAddress",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "districtAddress": {
+          "name": "districtAddress",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contentSearch": {
+          "name": "contentSearch",
+          "type": "tsvector",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "as": "(\n          setweight(to_tsvector('english', \"tfp\".\"representatives\".\"name\"), 'A') ||\n          setweight(to_tsvector('english', \"tfp\".\"representatives\".\"state\"), 'A')\n        )",
+            "type": "stored"
+          }
+        },
+        "airtableCreatedAt": {
+          "name": "airtableCreatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "airtableModifiedAt": {
+          "name": "airtableModifiedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "airtableData": {
+          "name": "airtableData",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "idx_content_search": {
+          "name": "idx_content_search",
+          "columns": [
+            {
+              "expression": "contentSearch",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "tfp.billCategory": {
+      "name": "billCategory",
+      "schema": "tfp",
+      "values": [
+        "Bathrooms",
+        "Book Ban",
+        "Digital Censorship",
+        "Documents",
+        "Drag",
+        "Educational Censorship",
+        "Health Care",
+        "Sports",
+        "Student Suppression",
+        "Trans Erasure",
+        "Abortion",
+        "Adoption",
+        "Aid and Abet",
+        "Anti-DEI",
+        "Anti-Discrimination",
+        "Armed Services",
+        "Censorship",
+        "College/Uni",
+        "Conscience/Religious Freedom",
+        "Conversion Therapy",
+        "Cross State",
+        "Custody",
+        "Data Collection",
+        "Deadnaming/Misgendering",
+        "Device Filter",
+        "Discrimination - Non Religious",
+        "Do Not Show",
+        "Econimic Boycotts",
+        "Economic Censorship",
+        "Effective Upon Signing",
+        "Fiduciary",
+        "Forced Outing",
+        "Healthcare Ban",
+        "Incarcerated",
+        "Insurance",
+        "K-12",
+        "Medical Liability",
+        "Misc Healthcare",
+        "Obscenity/Harmful to Minors",
+        "Other",
+        "Over 18",
+        "Panic Defense",
+        "Parents Rights",
+        "Pronouns",
+        "Public Funds",
+        "Resolution",
+        "Severability Clause",
+        "Sex Ed/Teaching Restriction",
+        "Social Media/Website",
+        "Online Censorship",
+        "Schools",
+        "Surveillance",
+        "Workplace Pronouns"
+      ]
+    },
+    "tfp.billImpact": {
+      "name": "billImpact",
+      "schema": "tfp",
+      "values": [
+        "Negative",
+        "Positive"
+      ]
+    },
+    "tfp.billLevel": {
+      "name": "billLevel",
+      "schema": "tfp",
+      "values": [
+        "State",
+        "National"
+      ]
+    },
+    "tfp.billProgress": {
+      "name": "billProgress",
+      "schema": "tfp",
+      "values": [
+        "Prefiled/Awaiting Introduction",
+        "Introduced",
+        "House Committee",
+        "Senate Committee",
+        "Joint Committee",
+        "House Floor",
+        "Senate Floor",
+        "Crossed over",
+        "Final vote",
+        "Conference Between Chambers",
+        "To Governor",
+        "Veto Override Vote",
+        "Passed",
+        "Failed",
+        "Injuncted",
+        "Struck Down",
+        "Undone",
+        "Veto Overturn Vote",
+        "D.C. Council",
+        "To Be Introduced",
+        "To President"
+      ]
+    },
+    "tfp.billRepRelation": {
+      "name": "billRepRelation",
+      "schema": "tfp",
+      "values": [
+        "Contact",
+        "Sponsor"
+      ]
+    },
+    "tfp.billStatus": {
+      "name": "billStatus",
+      "schema": "tfp",
+      "values": [
+        "Active",
+        "Passed",
+        "Failed",
+        "Not Anti-Trans in current form"
+      ]
+    },
+    "tfp.billVote": {
+      "name": "billVote",
+      "schema": "tfp",
+      "values": [
+        "Yea",
+        "Nay"
+      ]
+    },
+    "tfp.importLogStatusEnum": {
+      "name": "importLogStatusEnum",
+      "schema": "tfp",
+      "values": [
+        "Successful",
+        "In Progress",
+        "Failed"
+      ]
+    },
+    "tfp.importLogTableEnum": {
+      "name": "importLogTableEnum",
+      "schema": "tfp",
+      "values": [
+        "State Reps",
+        "National Reps",
+        "Negative Bills",
+        "Positive Bills",
+        "National Bills"
+      ]
+    },
+    "tfp.politicalParty": {
+      "name": "politicalParty",
+      "schema": "tfp",
+      "values": [
+        "Republican",
+        "Democrat",
+        "Independent",
+        "Unaffiliated",
+        "Libertarian",
+        "Progressive",
+        "Unenrolled",
+        "Vacant"
+      ]
+    },
+    "tfp.representativeLevel": {
+      "name": "representativeLevel",
+      "schema": "tfp",
+      "values": [
+        "State",
+        "National"
+      ]
+    },
+    "tfp.representativeRole": {
+      "name": "representativeRole",
+      "schema": "tfp",
+      "values": [
+        "House Representative",
+        "Assembly Member",
+        "Senator"
+      ]
+    }
+  },
+  "schemas": {
+    "tfp": "tfp"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

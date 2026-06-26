@@ -21,7 +21,9 @@ export const contactRequestTable = pgTable("contact_requests", {
   comment: text("comment").notNull(),
   communicationsConsent: boolean("communications_consent").default(false),
   communicationsId: char("communications_id", { length: 36 }),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  createdAt: timestamp("created_at")
+    .notNull()
+    .default(sql`now()`),
 });
 export type InsertableContactRequest = typeof contactRequestTable.$inferInsert;
 export type SelectableContactRequest = typeof contactRequestTable.$inferSelect;

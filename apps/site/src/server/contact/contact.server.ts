@@ -5,7 +5,10 @@ import {
 import { validateTurnstileToken } from "../turnstile/turnstile.server";
 import { Prettify } from "@/lib/utils";
 import { db } from "@/db/database";
-import { contactRequestTable, SelectableContactRequest } from "@/db/schema";
+import {
+  contactRequestTable,
+  SelectableContactRequest,
+} from "@dqc/data/schema";
 import { Resend } from "resend";
 import { serverEnv } from "@/env";
 

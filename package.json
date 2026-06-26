@@ -10,7 +10,8 @@
     "build:data": "npm run build -w @dqc/data",
     "build:site": "npm run build:data && npm run build -w @dqc/site",
     "build:tfp:data": "npm run build:data && npm run build -w @tfp/data",
-    "dev:site": "npm run dev -w @dqc/site",
+    "dev:docker": "docker compose -f compose/docker-compose-dev.yml up -d",
+    "dev:site": "concurrently 'npm run watch -w @dqc/data' 'npm run dev -w @dqc/site'",
     "start:site": "npm run start -w @dqc/site",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,5 +21,8 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
 }
