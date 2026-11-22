@@ -1,13 +1,23 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Fragment } from "react";
 import Definition from "@/components/_ui/Definition";
 import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
-import { createFileRoute } from "@tanstack/react-router";
+import { RichTextRenderer } from "@/components/rich-text/RichTextRenderer";
+import { listPublishedTeam } from "@/server/functions/team.functions";
 
 export const Route = createFileRoute("/about")({
+  // Everyone with a published bio, in the order set on the admin Team page.
+  loader: () => listPublishedTeam(),
+  head: () => ({
+    meta: [{ title: "About - Digital Queer Collective" }],
+  }),
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const team = Route.useLoaderData();
+
   return (
     <Main>
       <Prose>
@@ -70,111 +80,31 @@ function RouteComponent() {
           care, accessibility, and collective liberation.
         </p>
 
-        <h2>Our Team</h2>
-        <h3>
-          Devin Sharpe <span className="text-xs">he/him</span>
-        </h3>
-        <p>
-          Devin Sharpe is the co-founder of DQC, where he leads the development
-          and advancement of the collective’s projects and initiatives. Devin’s
-          formative years were spent in Detroit and the surrounding areas, while
-          his adolescence was nurtured in the South, namely the Atlanta metro
-          area. His life experience has been defined by his position at the
-          intersections of different identities. Growing up as a mixed-race,
-          bisexual man in a semi-nomadic, heavily spiritual household gave him
-          an optimistic belief that one’s true self will take root despite
-          societal and/or personal pressures to repress it.
-        </p>
-        <p>
-          Professionally, Devin works as a frontend-focused software engineer,
-          and has assisted teams in creating products or experiences that
-          delight everyday users and consumers while refusing to neglect those
-          who rely on accessibility assists. His current post at{" "}
-          <a href="https://gostrata.com">Strata Company</a>, based in
-          Pennsylvania, has him leading the frontend development of a new
-          product that connects digitally-minded marketing professionals with a
-          revitalized mail outreach channel. Prior to Strata, Devin has served
-          at a number of other companies, such as the Washington Post, where he
-          assisted with experimental products and initiatives.
-        </p>
-        <p>
-          Prior to starting DQC, Devin volunteered with queer advocacy
-          organizations in his free time, mostly with the{" "}
-          <a href="https://transformationsproject.org">
-            Trans Formations Project
-          </a>
-          . At TFP, he served on the Widget Development team and helped use US
-          legislative bill data collected by the organization to create
-          compelling web applications to assist queer people looking to track
-          dangerous, anti-trans legislation or how their representatives were
-          voting on their behalf.
-        </p>
-        <p>
-          By starting DQC and working with its members, Devin hopes to continue
-          to uplift the 2SLGBTQIA+ community by creating digital spaces where
-          queer safety is prioritized, identities are accepted, and queer
-          advocacy can happen.
-        </p>
-
-        <h3>
-          Laith Stevenson <span className="text-xs">she/they</span>
-        </h3>
-        <p>
-          Laith Stevenson is the co-founder of{" "}
-          <a href="https://dqc3.org">DQC(3)</a>, where she works at the
-          intersection of queer justice, technology, and civic infrastructure.
-          As an out and proud black trans woman from the rural South, Laith’s
-          work is shaped by lived experience navigating systems of surveillance,
-          exclusion, and legislative violence—experiences that ground DQC3’s
-          commitment to building community-controlled digital tools for
-          advancing liberation movements.
-        </p>
-        <p>
-          Currently, Laith is a graduate student at the{" "}
-          <a href="https://sp2.upenn.edu/">
-            University of Pennsylvania’s School of Social Policy &#38; Practice
-            &#40;SP2&#41;
-          </a>
-          , where she studies social policy with a focus on data ethics,
-          technology governance, and the political economy of automation. She is
-          pursuing a Certificate in Applied Data Ethics, Law, and the Social
-          Good and conducts research on the artificial intelligence, digital
-          equity, and the the socio-technical governance implications of
-          emerging technologies.{" "}
-        </p>
-        <p>
-          Laith is also a Policy Advocacy Intern with{" "}
-          <a href="https://publicknowledge.org/">Public Knowledge</a>,
-          supporting federal advocacy on open internet policy, communications
-          competition, and balanced intellectual property frameworks Her
-          professional background spans litigation support, social science
-          research, nonprofit development, and digital
-          communications—experiences that inform her interdisciplinary approach
-          to policy analysis and technical capacity building.{" "}
-        </p>
-        <p>
-          She has been deeply involved in trans-led legislative resistance
-          efforts, including volunteering with the{" "}
-          <a href="https://transformationsproject.org">
-            Trans Formations Project
-          </a>
-          , where she contributed bill summaries to a comprehensive database
-          tracking anti-trans and trans-affirming legislation nationwide
-          through. She also serves on the board of the{" "}
-          <a href="https://carpeatlanta.com/">
-            Center for Abolition Research, Policy, and Education (CARPE)
-          </a>
-          , supporting, research, governance and strategy for Black trans
-          advocacy.
-        </p>
-        <p>
-          Through DQC3, Laith advances a model of queer tech work rooted in
-          intersectionality, accessibility, and collective power. She
-          understands digital infrastructure as a site of political struggle and
-          believes that building ethical, justice-driven technology is essential
-          to sustaining social movements, protecting marginalized communities,
-          and imagining liberated futures.
-        </p>
+        {team.length > 0 && (
+          <>
+            <h2 id="our-team">Our Team</h2>
+            {team.map((member) => (
+              <Fragment key={member.id}>
+                <h3>
+                  {member.name}
+                  {member.pronouns && (
+                    <>
+                      {" "}
+                      <span className="text-xs">{member.pronouns}</span>
+                    </>
+                  )}
+                </h3>
+                {/* Under the h3 name, so a bio's headings start at h4. The
+                    first paragraph sits right under the name, as `h3 + p` does. */}
+                <RichTextRenderer
+                  document={member.bio}
+                  heading_shift={1}
+                  className="rich-text [&>:first-child]:mt-0"
+                />
+              </Fragment>
+            ))}
+          </>
+        )}
       </Prose>
     </Main>
   );

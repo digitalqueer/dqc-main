@@ -1,6 +1,6 @@
 # dqc-main
 
-The Digital Queer Collective's site (dqc.dev): who the collective is, its projects, and its writing ("thoughts"), plus a contact form. Admins sign in with DQC's own sign-in service to reach `/dashboard`.
+The Digital Queer Collective's site (dqc.dev): who the collective is, its team and projects, and its writing ("thoughts" and statements), plus a contact form. Admins sign in with DQC's own sign-in service to reach `/dashboard`, where they write and publish all of it.
 
 The app follows the same structure as [devsharpe](https://github.com/devinsharpe/devsharpe), and code is copied between the two. Its README explains the patterns in more depth.
 
@@ -11,6 +11,9 @@ The app follows the same structure as [devsharpe](https://github.com/devinsharpe
 - [Project layout](#project-layout)
 - [How a request flows](#how-a-request-flows)
 - [Authentication](#authentication)
+- [Contact form](#contact-form)
+- [Admin pages](#admin-pages)
+- [Content](#content)
 - [Migrations](#migrations)
 - [Deploying](#deploying)
 
@@ -98,9 +101,12 @@ See [`.env.example`](.env.example) for every variable, with comments. Server cod
     ├── routes/               File-based routes: pages and server routes
     │   ├── __root.tsx        Document shell, header/footer, <head>
     │   ├── _authenticated.tsx  Sign-in guard for the admin pages
-    │   ├── _authenticated/   Admin: /dashboard, /dashboard/requests
+    │   ├── _authenticated/   Admin: /dashboard and its requests, posts, projects and team pages
+    │   ├── thoughts/, statements/, projects/  Published content (see Content)
     │   └── api/              Server routes: auth, health
-    ├── components/           _ui/ holds the primitives (Button, Dialog, AlertDialog, Toast, …)
+    ├── components/           _ui/ holds the primitives (Button, Dialog, AlertDialog, Toast, form fields, …)
+    │   ├── forms/            Admin forms, built with useAppForm (src/forms/context.form.ts)
+    │   └── rich-text/        The Lexical editor, its toolbar, and the renderer for published pages
     ├── lib/                  Client-safe: constants, Zod schemas, pure helpers
     ├── server/               Server-only code
     │   ├── functions/        Server functions (*.functions.ts): the app's API
@@ -113,8 +119,6 @@ See [`.env.example`](.env.example) for every variable, with comments. Server cod
     │   └── env.server.ts     Environment access
     └── styles/
 ```
-
-`src/server/thoughts/` predates this layout. It moves into `functions/`, `middleware/` and `repositories/`, with its schemas in `src/lib`, when thoughts get their admin pages.
 
 ## How a request flows
 
@@ -162,10 +166,13 @@ Each request has a `read_at` column: null while it's new, and set when an admin 
 
 ## Admin pages
 
-Everything under `src/routes/_authenticated/` needs a session (see [Authentication](#authentication)). Today that's:
+Everything under `src/routes/_authenticated/` needs a session (see [Authentication](#authentication)):
 
-- **`/dashboard`:** the three newest contact requests, and placeholders for thoughts, projects and the team, which move into Postgres next.
+- **`/dashboard`:** the three newest contact requests, the three most recently edited posts, the first three active projects, and the team.
 - **`/dashboard/requests`:** the inbox. New requests come first, then read ones 20 to a page. Each can be answered by email, marked read or new, or deleted.
+- **`/dashboard/posts`:** thoughts and statements, drafts first. New posts start as drafts; **`/dashboard/posts/$postId`** is where they're written and published.
+- **`/dashboard/projects`:** active and past projects, each in the order it's listed on the site (drag a row's handle, or focus it and use the arrow keys). **`/dashboard/projects/$projectId`** writes the project's page.
+- **`/dashboard/team`:** the people on the About page, in order, the same way. **`/dashboard/team/$memberId`** writes their bio.
 
 The admin layout wraps its pages in an `AlertDialogProvider`, so any of them can ask before doing something that can't be undone:
 
@@ -176,12 +183,33 @@ if (!(await confirm({ title: "Delete it?", confirm_label: "Delete", is_destructi
 
 New admin pages start with a [`BreadcrumbNav`](src/components/_ui/BreadcrumbNav.tsx). After a change, they call `router.invalidate()` to reload their loader data, and report the result with a toast, as [`ContactRequestItem`](src/components/ContactRequestItem.tsx) does. A loader that throws shows [`ErrorView`](src/components/_ui/ErrorView.tsx) with the error's message, so write those messages for the person reading them.
 
+## Content
+
+Thoughts, statements, projects and the team's bios live in Postgres and are edited from the admin pages. Nothing on the public pages is written into the code any more.
+
+| Content    | Table                     | Public page                                                                  |
+| ---------- | ------------------------- | ---------------------------------------------------------------------------- |
+| Thoughts   | `post` (`kind` `thought`)   | Listed on `/thoughts`, each at `/thoughts/$slug`                             |
+| Statements | `post` (`kind` `statement`) | Each at `/statements/$slug` (not listed; link to them, e.g. from About)      |
+| Projects   | `project`, `project_page` | Listed on `/projects` (and the first three active ones on `/`), page at `/projects/$slug` |
+| Team       | `team_member`             | "Our Team" on `/about`                                                       |
+
+**Drafts and publishing.** Each piece of rich text has a draft and a published copy (`draft_content` and `published_content`). Saving (⌘/Ctrl+S) only changes the draft; Publish copies it to the live page in the same write, and Unpublish takes the page down but keeps the draft. Public server functions only ever read the published copy, so a draft is never sent to a visitor. A post's date (`published_at`) is set the first time it's published; publishing changes later sets `revised_at`, and its page shows "Updated" from a different day on. A project without a published page is still listed on `/projects`, just without a link; its `/projects/$slug` is a 404. Someone on the team appears on `/about` once their bio is published.
+
+**Rich text** is stored as Lexical's JSON (see [`src/lib/rich-text.ts`](src/lib/rich-text.ts)). The editor ([`components/rich-text/`](src/components/rich-text)) is client-only and loaded only on the editor pages. Public pages render the JSON with [`RichTextRenderer`](src/components/rich-text/RichTextRenderer.tsx), which doesn't use Lexical. It renders only the node types it knows, shows unsafe links (anything but http(s), `mailto:` and paths on this site) as plain text, and opens other sites' links in a new tab. Page titles are h2s (the site name in the header is the h1), so documents use h3 and h4: `##` in the editor makes a heading and `###` a subheading, and the renderer folds any other level into those. There are no images in rich text yet.
+
+**Slugs** follow the title (or name) as you type until you change them by hand. A post's slug and kind can change, which changes its URL; a published post warns about that. A project's slug is its id, fixed once it's created.
+
+The content that was written into the pages before (the 2026 thought, the three statements as empty drafts, the Trans Formations Data Archive and its page, and both bios) moved into these tables in the `content_seed` migration, so a new database starts with it. Edit it from the admin pages, not by changing that migration.
+
 ## Migrations
 
 1. Change [`schema.server.ts`](src/server/database/schema.server.ts).
 2. Run `npm run gen-migration`, which writes `drizzle/<timestamp>_<name>/migration.sql` and a snapshot.
 3. Read the generated SQL, especially for renames, which drizzle-kit may treat as a drop and an add.
 4. Apply it with `docker compose exec app npm run migrate`, or restart the app container.
+
+Data changes that every environment needs, like `content_seed`, go in a migration of their own: `npx drizzle-kit generate --custom --name <name>` makes an empty one to write SQL into. Keep each statement separated with `--> statement-breakpoint`.
 
 drizzle-kit and the production image's migrator (drizzle-orm's own, see [Deploying](#deploying)) record what they've applied in the same table, `drizzle.__drizzle_migrations`, so either can follow the other. The first migration, `20260324232124_odd_titania`, was converted from drizzle-kit 0.31's format with `drizzle-kit up`. Databases that 0.31 migrated recognise it as already applied.
 

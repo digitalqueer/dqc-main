@@ -15,12 +15,19 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
-import { Route as ProjectsTfpRouteImport } from './routes/projects/tfp'
+import { Route as ProjectsSlugRouteImport } from './routes/projects/$slug'
+import { Route as StatementsSlugRouteImport } from './routes/statements/$slug'
 import { Route as ThoughtsIndexRouteImport } from './routes/thoughts/index'
 import { Route as ThoughtsSlugRouteImport } from './routes/thoughts/$slug'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthenticatedDashboardPostsIndexRouteImport } from './routes/_authenticated/dashboard/posts/index'
+import { Route as AuthenticatedDashboardPostsPostIdRouteImport } from './routes/_authenticated/dashboard/posts/$postId'
+import { Route as AuthenticatedDashboardProjectsIndexRouteImport } from './routes/_authenticated/dashboard/projects/index'
+import { Route as AuthenticatedDashboardProjectsProjectIdRouteImport } from './routes/_authenticated/dashboard/projects/$projectId'
 import { Route as AuthenticatedDashboardRequestsIndexRouteImport } from './routes/_authenticated/dashboard/requests/index'
+import { Route as AuthenticatedDashboardTeamIndexRouteImport } from './routes/_authenticated/dashboard/team/index'
+import { Route as AuthenticatedDashboardTeamMemberIdRouteImport } from './routes/_authenticated/dashboard/team/$memberId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,9 +58,14 @@ const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
   path: '/projects/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProjectsTfpRoute = ProjectsTfpRouteImport.update({
-  id: '/projects/tfp',
-  path: '/projects/tfp',
+const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
+  id: '/projects/$slug',
+  path: '/projects/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatementsSlugRoute = StatementsSlugRouteImport.update({
+  id: '/statements/$slug',
+  path: '/statements/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ThoughtsIndexRoute = ThoughtsIndexRouteImport.update({
@@ -77,10 +89,46 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardPostsIndexRoute =
+  AuthenticatedDashboardPostsIndexRouteImport.update({
+    id: '/dashboard/posts/',
+    path: '/dashboard/posts/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardPostsPostIdRoute =
+  AuthenticatedDashboardPostsPostIdRouteImport.update({
+    id: '/dashboard/posts/$postId',
+    path: '/dashboard/posts/$postId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProjectsIndexRoute =
+  AuthenticatedDashboardProjectsIndexRouteImport.update({
+    id: '/dashboard/projects/',
+    path: '/dashboard/projects/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProjectsProjectIdRoute =
+  AuthenticatedDashboardProjectsProjectIdRouteImport.update({
+    id: '/dashboard/projects/$projectId',
+    path: '/dashboard/projects/$projectId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRequestsIndexRoute =
   AuthenticatedDashboardRequestsIndexRouteImport.update({
     id: '/dashboard/requests/',
     path: '/dashboard/requests/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardTeamIndexRoute =
+  AuthenticatedDashboardTeamIndexRouteImport.update({
+    id: '/dashboard/team/',
+    path: '/dashboard/team/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardTeamMemberIdRoute =
+  AuthenticatedDashboardTeamMemberIdRouteImport.update({
+    id: '/dashboard/team/$memberId',
+    path: '/dashboard/team/$memberId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
@@ -89,26 +137,40 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/api/health': typeof ApiHealthRoute
-  '/projects/tfp': typeof ProjectsTfpRoute
+  '/projects/$slug': typeof ProjectsSlugRoute
+  '/statements/$slug': typeof StatementsSlugRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/thoughts/': typeof ThoughtsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/posts/$postId': typeof AuthenticatedDashboardPostsPostIdRoute
+  '/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
+  '/dashboard/team/$memberId': typeof AuthenticatedDashboardTeamMemberIdRoute
+  '/dashboard/posts/': typeof AuthenticatedDashboardPostsIndexRoute
+  '/dashboard/projects/': typeof AuthenticatedDashboardProjectsIndexRoute
   '/dashboard/requests/': typeof AuthenticatedDashboardRequestsIndexRoute
+  '/dashboard/team/': typeof AuthenticatedDashboardTeamIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/api/health': typeof ApiHealthRoute
-  '/projects/tfp': typeof ProjectsTfpRoute
+  '/projects/$slug': typeof ProjectsSlugRoute
+  '/statements/$slug': typeof StatementsSlugRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
   '/projects': typeof ProjectsIndexRoute
   '/thoughts': typeof ThoughtsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/posts/$postId': typeof AuthenticatedDashboardPostsPostIdRoute
+  '/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
+  '/dashboard/team/$memberId': typeof AuthenticatedDashboardTeamMemberIdRoute
+  '/dashboard/posts': typeof AuthenticatedDashboardPostsIndexRoute
+  '/dashboard/projects': typeof AuthenticatedDashboardProjectsIndexRoute
   '/dashboard/requests': typeof AuthenticatedDashboardRequestsIndexRoute
+  '/dashboard/team': typeof AuthenticatedDashboardTeamIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -117,13 +179,20 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/api/health': typeof ApiHealthRoute
-  '/projects/tfp': typeof ProjectsTfpRoute
+  '/projects/$slug': typeof ProjectsSlugRoute
+  '/statements/$slug': typeof StatementsSlugRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/thoughts/': typeof ThoughtsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/posts/$postId': typeof AuthenticatedDashboardPostsPostIdRoute
+  '/_authenticated/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
+  '/_authenticated/dashboard/team/$memberId': typeof AuthenticatedDashboardTeamMemberIdRoute
+  '/_authenticated/dashboard/posts/': typeof AuthenticatedDashboardPostsIndexRoute
+  '/_authenticated/dashboard/projects/': typeof AuthenticatedDashboardProjectsIndexRoute
   '/_authenticated/dashboard/requests/': typeof AuthenticatedDashboardRequestsIndexRoute
+  '/_authenticated/dashboard/team/': typeof AuthenticatedDashboardTeamIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,26 +201,40 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/api/health'
-    | '/projects/tfp'
+    | '/projects/$slug'
+    | '/statements/$slug'
     | '/thoughts/$slug'
     | '/projects/'
     | '/thoughts/'
     | '/api/auth/$'
     | '/dashboard/'
+    | '/dashboard/posts/$postId'
+    | '/dashboard/projects/$projectId'
+    | '/dashboard/team/$memberId'
+    | '/dashboard/posts/'
+    | '/dashboard/projects/'
     | '/dashboard/requests/'
+    | '/dashboard/team/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/login'
     | '/api/health'
-    | '/projects/tfp'
+    | '/projects/$slug'
+    | '/statements/$slug'
     | '/thoughts/$slug'
     | '/projects'
     | '/thoughts'
     | '/api/auth/$'
     | '/dashboard'
+    | '/dashboard/posts/$postId'
+    | '/dashboard/projects/$projectId'
+    | '/dashboard/team/$memberId'
+    | '/dashboard/posts'
+    | '/dashboard/projects'
     | '/dashboard/requests'
+    | '/dashboard/team'
   id:
     | '__root__'
     | '/'
@@ -159,13 +242,20 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/api/health'
-    | '/projects/tfp'
+    | '/projects/$slug'
+    | '/statements/$slug'
     | '/thoughts/$slug'
     | '/projects/'
     | '/thoughts/'
     | '/api/auth/$'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/posts/$postId'
+    | '/_authenticated/dashboard/projects/$projectId'
+    | '/_authenticated/dashboard/team/$memberId'
+    | '/_authenticated/dashboard/posts/'
+    | '/_authenticated/dashboard/projects/'
     | '/_authenticated/dashboard/requests/'
+    | '/_authenticated/dashboard/team/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -174,7 +264,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
   ApiHealthRoute: typeof ApiHealthRoute
-  ProjectsTfpRoute: typeof ProjectsTfpRoute
+  ProjectsSlugRoute: typeof ProjectsSlugRoute
+  StatementsSlugRoute: typeof StatementsSlugRoute
   ThoughtsSlugRoute: typeof ThoughtsSlugRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
   ThoughtsIndexRoute: typeof ThoughtsIndexRoute
@@ -225,11 +316,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/projects/tfp': {
-      id: '/projects/tfp'
-      path: '/projects/tfp'
-      fullPath: '/projects/tfp'
-      preLoaderRoute: typeof ProjectsTfpRouteImport
+    '/projects/$slug': {
+      id: '/projects/$slug'
+      path: '/projects/$slug'
+      fullPath: '/projects/$slug'
+      preLoaderRoute: typeof ProjectsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/statements/$slug': {
+      id: '/statements/$slug'
+      path: '/statements/$slug'
+      fullPath: '/statements/$slug'
+      preLoaderRoute: typeof StatementsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/thoughts/': {
@@ -260,6 +358,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/posts/': {
+      id: '/_authenticated/dashboard/posts/'
+      path: '/dashboard/posts'
+      fullPath: '/dashboard/posts/'
+      preLoaderRoute: typeof AuthenticatedDashboardPostsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/posts/$postId': {
+      id: '/_authenticated/dashboard/posts/$postId'
+      path: '/dashboard/posts/$postId'
+      fullPath: '/dashboard/posts/$postId'
+      preLoaderRoute: typeof AuthenticatedDashboardPostsPostIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/projects/': {
+      id: '/_authenticated/dashboard/projects/'
+      path: '/dashboard/projects'
+      fullPath: '/dashboard/projects/'
+      preLoaderRoute: typeof AuthenticatedDashboardProjectsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/projects/$projectId': {
+      id: '/_authenticated/dashboard/projects/$projectId'
+      path: '/dashboard/projects/$projectId'
+      fullPath: '/dashboard/projects/$projectId'
+      preLoaderRoute: typeof AuthenticatedDashboardProjectsProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/requests/': {
       id: '/_authenticated/dashboard/requests/'
       path: '/dashboard/requests'
@@ -267,18 +393,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRequestsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/team/': {
+      id: '/_authenticated/dashboard/team/'
+      path: '/dashboard/team'
+      fullPath: '/dashboard/team/'
+      preLoaderRoute: typeof AuthenticatedDashboardTeamIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/team/$memberId': {
+      id: '/_authenticated/dashboard/team/$memberId'
+      path: '/dashboard/team/$memberId'
+      fullPath: '/dashboard/team/$memberId'
+      preLoaderRoute: typeof AuthenticatedDashboardTeamMemberIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardPostsPostIdRoute: typeof AuthenticatedDashboardPostsPostIdRoute
+  AuthenticatedDashboardProjectsProjectIdRoute: typeof AuthenticatedDashboardProjectsProjectIdRoute
+  AuthenticatedDashboardTeamMemberIdRoute: typeof AuthenticatedDashboardTeamMemberIdRoute
+  AuthenticatedDashboardPostsIndexRoute: typeof AuthenticatedDashboardPostsIndexRoute
+  AuthenticatedDashboardProjectsIndexRoute: typeof AuthenticatedDashboardProjectsIndexRoute
   AuthenticatedDashboardRequestsIndexRoute: typeof AuthenticatedDashboardRequestsIndexRoute
+  AuthenticatedDashboardTeamIndexRoute: typeof AuthenticatedDashboardTeamIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+  AuthenticatedDashboardPostsPostIdRoute:
+    AuthenticatedDashboardPostsPostIdRoute,
+  AuthenticatedDashboardProjectsProjectIdRoute:
+    AuthenticatedDashboardProjectsProjectIdRoute,
+  AuthenticatedDashboardTeamMemberIdRoute:
+    AuthenticatedDashboardTeamMemberIdRoute,
+  AuthenticatedDashboardPostsIndexRoute: AuthenticatedDashboardPostsIndexRoute,
+  AuthenticatedDashboardProjectsIndexRoute:
+    AuthenticatedDashboardProjectsIndexRoute,
   AuthenticatedDashboardRequestsIndexRoute:
     AuthenticatedDashboardRequestsIndexRoute,
+  AuthenticatedDashboardTeamIndexRoute: AuthenticatedDashboardTeamIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -291,7 +447,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
   ApiHealthRoute: ApiHealthRoute,
-  ProjectsTfpRoute: ProjectsTfpRoute,
+  ProjectsSlugRoute: ProjectsSlugRoute,
+  StatementsSlugRoute: StatementsSlugRoute,
   ThoughtsSlugRoute: ThoughtsSlugRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
   ThoughtsIndexRoute: ThoughtsIndexRoute,
