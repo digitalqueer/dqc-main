@@ -2,7 +2,6 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { FolderArchiveIcon, FolderPlusIcon } from "lucide-react";
 import { type ReactNode, useMemo, useState } from "react";
-import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Button from "@/components/_ui/Button";
 import Dialog from "@/components/_ui/Dialog";
 import Divider from "@/components/_ui/Divider";
@@ -114,9 +113,6 @@ function RouteComponent() {
 
   return (
     <Main>
-      <BreadcrumbNav current_page_label="Projects">
-        <BreadcrumbItem to="/dashboard">Dashboard</BreadcrumbItem>
-      </BreadcrumbNav>
       <p className="-mt-4 text-sm text-neutral-300">
         Drag a project by its handle, or focus the handle and use the arrow
         keys, to change where it's listed. The first three active projects show

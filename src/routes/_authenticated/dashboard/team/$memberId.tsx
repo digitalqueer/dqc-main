@@ -2,7 +2,6 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowUpRightIcon } from "lucide-react";
 import { useState } from "react";
-import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Link from "@/components/_ui/Link";
 import Main from "@/components/_ui/Main";
 import { PublishingEditor } from "@/components/rich-text/PublishingEditor";
@@ -17,6 +16,7 @@ import {
 export const Route = createFileRoute(
   "/_authenticated/dashboard/team/$memberId",
 )({
+  staticData: { breadcrumb: Breadcrumb },
   loader: ({ params }) => {
     if (!isTeamMemberId(params.memberId)) throw notFound();
     return getBioEditor({ data: { id: params.memberId } });
@@ -30,6 +30,11 @@ export const Route = createFileRoute(
   }),
   component: RouteComponent,
 });
+
+// Annotated: its type can't be inferred from Route, whose options include it.
+function Breadcrumb(): string {
+  return Route.useLoaderData().member.name;
+}
 
 function RouteComponent() {
   const data = Route.useLoaderData();
@@ -47,10 +52,6 @@ function BioEditor({ member, content, status: loaded_status }: EditorData) {
 
   return (
     <Main>
-      <BreadcrumbNav current_page_label={member.name}>
-        <BreadcrumbItem to="/dashboard">Dashboard</BreadcrumbItem>
-        <BreadcrumbItem to="/dashboard/team">Team</BreadcrumbItem>
-      </BreadcrumbNav>
       <PublishingEditor
         title={member.name}
         details={

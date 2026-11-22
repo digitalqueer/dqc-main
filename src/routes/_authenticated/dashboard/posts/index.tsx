@@ -5,7 +5,6 @@ import {
 } from "@tanstack/react-router";
 import { FilePlusIcon } from "lucide-react";
 import { useMemo, useState } from "react";
-import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Button from "@/components/_ui/Button";
 import Dialog from "@/components/_ui/Dialog";
 import Divider from "@/components/_ui/Divider";
@@ -81,9 +80,6 @@ function RouteComponent() {
 
   return (
     <Main>
-      <BreadcrumbNav current_page_label="Thoughts & Statements">
-        <BreadcrumbItem to="/dashboard">Dashboard</BreadcrumbItem>
-      </BreadcrumbNav>
       <section className="flex flex-col gap-4">
         <div className="flex gap-8">
           <h2 className="text-2xl font-semibold">Drafts</h2>

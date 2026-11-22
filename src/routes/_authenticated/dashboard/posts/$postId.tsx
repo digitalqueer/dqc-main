@@ -7,7 +7,6 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import { PencilLineIcon } from "lucide-react";
 import { useState } from "react";
-import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Button from "@/components/_ui/Button";
 import Dialog from "@/components/_ui/Dialog";
 import Main from "@/components/_ui/Main";
@@ -24,6 +23,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/dashboard/posts/$postId")(
   {
+    staticData: { breadcrumb: Breadcrumb },
     loader: ({ params }) => {
       if (!isPostId(params.postId)) throw notFound();
       return getPostEditor({ data: { id: params.postId } });
@@ -38,6 +38,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/posts/$postId")(
     component: RouteComponent,
   },
 );
+
+// Annotated: its type can't be inferred from Route, whose options include it.
+function Breadcrumb(): string {
+  return Route.useLoaderData().post.title;
+}
 
 function RouteComponent() {
   const data = Route.useLoaderData();
@@ -61,12 +66,6 @@ function PostEditor({ post, content, status: loaded_status }: EditorData) {
 
   return (
     <Main>
-      <BreadcrumbNav current_page_label={post.title}>
-        <BreadcrumbItem to="/dashboard">Dashboard</BreadcrumbItem>
-        <BreadcrumbItem to="/dashboard/posts">
-          Thoughts & Statements
-        </BreadcrumbItem>
-      </BreadcrumbNav>
       <PublishingEditor
         title={post.title}
         details={

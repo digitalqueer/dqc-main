@@ -28,6 +28,8 @@ const Devtools = import.meta.env.DEV
   : null;
 
 export const Route = createRootRoute({
+  // The first crumb on every page (see components/_ui/Breadcrumbs.tsx).
+  staticData: { breadcrumb: "Home" },
   head: ({ loaderData, matches }) => {
     const origin = loaderData?.origin;
     const path = withoutTrailingSlash(matches.at(-1)?.pathname ?? "/");

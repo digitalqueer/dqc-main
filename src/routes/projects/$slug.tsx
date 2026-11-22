@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
 import { RichTextRenderer } from "@/components/rich-text/RichTextRenderer";
@@ -7,6 +6,7 @@ import { pageMeta } from "@/lib/share";
 import { getPublishedProjectPage } from "@/server/functions/projects.functions";
 
 export const Route = createFileRoute("/projects/$slug")({
+  staticData: { breadcrumb: Breadcrumb },
   loader: ({ params }) =>
     getPublishedProjectPage({ data: { slug: params.slug } }),
   head: ({ loaderData }) =>
@@ -21,14 +21,16 @@ export const Route = createFileRoute("/projects/$slug")({
   component: RouteComponent,
 });
 
+// Annotated: its type can't be inferred from Route, whose options include it.
+function Breadcrumb(): string {
+  return Route.useLoaderData().project.name;
+}
+
 function RouteComponent() {
-  const { project, content, media } = Route.useLoaderData();
+  const { content, media } = Route.useLoaderData();
 
   return (
     <Main>
-      <BreadcrumbNav current_page_label={project.name}>
-        <BreadcrumbItem to="/projects">Projects</BreadcrumbItem>
-      </BreadcrumbNav>
       <Prose>
         {/* Wrapped, so prose's no-margin-on-the-first-child rule needs repeating. */}
         <RichTextRenderer

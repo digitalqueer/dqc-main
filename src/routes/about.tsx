@@ -8,6 +8,7 @@ import { pageMeta } from "@/lib/share";
 import { getPublishedTeam } from "@/server/functions/team.functions";
 
 export const Route = createFileRoute("/about")({
+  staticData: { breadcrumb: "About" },
   // Everyone with a published bio, in the order set on the admin Team page.
   loader: () => getPublishedTeam(),
   head: () => ({

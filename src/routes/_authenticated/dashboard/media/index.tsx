@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-router";
 import { ArrowLeftIcon, ArrowRightIcon, ImageUpIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
-import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Button from "@/components/_ui/Button";
 import Dialog from "@/components/_ui/Dialog";
 import Link from "@/components/_ui/Link";
@@ -23,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { getMediaLibrary } from "@/server/functions/media.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/media/")({
+  staticData: { breadcrumb: "Media" },
   validateSearch: mediaLibrarySearchSchema,
   // Keeps "?page=1" out of URLs.
   search: { middlewares: [stripSearchParams({ page: 1 })] },
@@ -98,9 +98,6 @@ function RouteComponent() {
 
   return (
     <Main>
-      <BreadcrumbNav current_page_label="Media">
-        <BreadcrumbItem to="/dashboard">Dashboard</BreadcrumbItem>
-      </BreadcrumbNav>
       {!setup.can_upload && (
         <SetupNotice
           title="Uploads are off: media storage isn't configured."

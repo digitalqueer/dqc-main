@@ -6,7 +6,6 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import { UserPlusIcon } from "lucide-react";
 import { useState } from "react";
-import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Button from "@/components/_ui/Button";
 import Dialog from "@/components/_ui/Dialog";
 import Main from "@/components/_ui/Main";
@@ -78,9 +77,6 @@ function RouteComponent() {
 
   return (
     <Main>
-      <BreadcrumbNav current_page_label="Team">
-        <BreadcrumbItem to="/dashboard">Dashboard</BreadcrumbItem>
-      </BreadcrumbNav>
       <section className="flex flex-col gap-4">
         <div className="flex gap-8">
           <h2 className="text-2xl font-semibold">Our Team</h2>

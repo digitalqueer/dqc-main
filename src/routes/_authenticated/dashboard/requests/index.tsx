@@ -1,6 +1,5 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
-import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Divider from "@/components/_ui/Divider";
 import Link from "@/components/_ui/Link";
 import Main from "@/components/_ui/Main";
@@ -13,6 +12,7 @@ import { contactRequestsSearchSchema } from "@/lib/contact";
 import { listContactRequests } from "@/server/functions/contact.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
+  staticData: { breadcrumb: "Contact Requests" },
   validateSearch: contactRequestsSearchSchema,
   // Keeps "?page=1" out of URLs.
   search: { middlewares: [stripSearchParams({ page: 1 })] },
@@ -44,9 +44,6 @@ function RouteComponent() {
 
   return (
     <Main>
-      <BreadcrumbNav current_page_label="Contact Requests">
-        <BreadcrumbItem to="/dashboard">Dashboard</BreadcrumbItem>
-      </BreadcrumbNav>
       {setup.missing_turnstile.length > 0 && (
         <p className="border border-yellow-200 bg-yellow-950/40 p-3 text-sm">
           The contact form is off: Turnstile isn't configured. Set{" "}
