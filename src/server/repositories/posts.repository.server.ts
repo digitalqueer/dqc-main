@@ -68,6 +68,16 @@ export class PostsRepository {
       .orderBy(...NEWEST_PUBLISHED_FIRST);
   }
 
+  /** The `limit` newest published posts of `kind`, with their published content (for the feed). */
+  public listFeedPosts(kind: PostKind, limit: number) {
+    return this.db
+      .select({ ...POST_SUMMARY, content: post.publishedContent })
+      .from(post)
+      .where(and(eq(post.kind, kind), isNotNull(post.publishedAt)))
+      .orderBy(...NEWEST_PUBLISHED_FIRST)
+      .limit(limit);
+  }
+
   /**
    * Every post: unpublished ones first (Postgres sorts NULL `published_at`
    * first when descending), each group newest first.

@@ -92,7 +92,7 @@ See [`.env.example`](.env.example) for every variable, with comments. Server cod
 | `S3_BUCKET`, `S3_REGION`, `S3_ENDPOINT`, `S3_PUBLIC_ENDPOINT`, `S3_FORCE_PATH_STYLE`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Media uploads                                                                        | Uploads are switched off, and the media library says what's missing    |
 | `S3_CORS_ORIGINS`                                                                                                                | Optional: origins allowed to upload, applied to the bucket when the container starts | The bucket's CORS rules are left alone                                 |
 | `IMGPROXY_URL`, `IMGPROXY_KEY`, `IMGPROXY_SALT`, `IMGPROXY_SOURCE_PREFIX`                                                        | Showing images                                                                       | Images are left out of pages                                           |
-| `SITE_URL`                                                                                                                       | The public origin for absolute links in link previews                                | Falls back to `BETTER_AUTH_URL`, then to the request's origin          |
+| `SITE_URL`                                                                                                                       | The public origin for absolute links in link previews and the RSS feed               | Falls back to `BETTER_AUTH_URL`, then to the request's origin          |
 
 ## Project layout
 
@@ -115,6 +115,7 @@ See [`.env.example`](.env.example) for every variable, with comments. Server cod
     │   ├── _authenticated/   Admin: /dashboard and its requests, posts, projects, team and media pages
     │   ├── thoughts/, statements/, projects/  Published content (see Content)
     │   ├── og/               Server route: share cards (/og/*)
+    │   ├── rss[.]xml.ts      Server route: the RSS feed of thoughts (/rss.xml)
     │   └── api/              Server routes: auth, health
     ├── components/           _ui/ holds the primitives (Button, Dialog, AlertDialog, Toast, form fields, …)
     │   ├── forms/            Admin forms, built with useAppForm (src/forms/context.form.ts)
@@ -128,6 +129,8 @@ See [`.env.example`](.env.example) for every variable, with comments. Server cod
     │   ├── database/         Drizzle client, schema, relations, migrator
     │   ├── media/            The bucket, imgproxy URLs, and media as pages see it
     │   ├── og/               Share cards: the design, drawing, responses
+    │   ├── feed.server.ts    The RSS feed; rich-text-html.server.ts renders its content
+    │   ├── http.server.ts    The public origin and ETags, for the server routes
     │   ├── auth.server.ts    Better Auth instance
     │   ├── resend.server.ts  Adds people who opt in to Resend's contacts
     │   ├── turnstile.server.ts  Checks Turnstile tokens with Cloudflare
@@ -151,7 +154,7 @@ flowchart LR
 
 - **Request middleware** ([`src/start.ts`](src/start.ts)) wraps everything the server handles. `requestLogger` logs `[id] METHOD /path 12ms` and sets an `x-request-id` header. `createCsrfMiddleware` guards server function calls.
 - **Server functions** are the app's only API for pages. Each one declares its middleware (auth first for admin functions, then the repositories it needs in `context`) and a Zod validator, then calls into a repository.
-- **Server routes** handle raw HTTP that isn't page data: the Better Auth handler, `/api/health` and the share cards.
+- **Server routes** handle raw HTTP that isn't page data: the Better Auth handler, `/api/health`, the share cards and the RSS feed.
 
 ## Authentication
 
@@ -270,6 +273,16 @@ A page's own `head` wins, tag by tag. Pages set theirs with `pageMeta({ title, d
 - **Caching.** Cards are cached for a day, with an `ETag`. Each process also keeps the last 100 cards it drew, so a card is usually drawn once. Drawing one takes about 15 ms, plus about 100 ms for the first after a start.
 
 **How they're drawn.** [satori](https://github.com/vercel/satori) lays out the element tree and turns it into an SVG, with text as paths. [resvg](https://github.com/yisibl/resvg-js) turns the SVG into a PNG ([`render.server.ts`](src/server/og/render.server.ts)). Both are WebAssembly, so the build is the same on every platform. The image has no `node_modules`, so resvg's `.wasm` and the font are built into the server bundle with a `?base64` import, a small plugin in [`vite.config.ts`](vite.config.ts). The renderer is a separate 3.4 MB chunk, loaded on the first card a process draws.
+
+## RSS feed
+
+[`/rss.xml`](src/routes/rss%5B.%5Dxml.ts) is an RSS 2.0 feed of the 20 newest published thoughts. Every page advertises it with a `<link rel="alternate">`, and `/thoughts` links to it.
+
+- **Each item** has the title, link, publish date, author (as `dc:creator`, since RSS's own `<author>` must be an email address), the summary (the description, or else the excerpt) as `<description>`, and the full post as HTML in `<content:encoded>`.
+- **The HTML** comes from [`rich-text-html.server.ts`](src/server/rich-text-html.server.ts), which follows the renderer's rules: known nodes only, safe links only, headings folded to h3/h4, and images from the media library at the top level only. It has no classes, and relative links are made absolute so they work in a feed reader.
+- **Items are identified by the post's id** (`urn:uuid:…`), so changing a slug doesn't make readers show a thought as new.
+- **Caching.** The feed is cached for 15 minutes with an `ETag`, so a reader that polls gets a `304` until something changes.
+- **Statements aren't in it.** They're standing positions rather than news.
 
 ## Migrations
 

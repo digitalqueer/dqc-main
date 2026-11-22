@@ -10,6 +10,7 @@ import { lazy, Suspense, useCallback, useMemo, useState } from "react";
 import Header from "@/components/_ui/Header";
 import Footer from "@/components/_ui/Footer";
 import { ToastProvider } from "@/components/_ui/Toast";
+import { THOUGHTS_FEED_PATH, THOUGHTS_FEED_TITLE } from "@/lib/posts";
 import {
   previewMeta,
   SITE_DESCRIPTION,
@@ -66,6 +67,13 @@ export const Route = createRootRoute({
         {
           rel: "preconnect",
           href: "https://challenges.cloudflare.com",
+        },
+        // Lets browsers and feed readers find the RSS feed from any page.
+        {
+          rel: "alternate",
+          type: "application/rss+xml",
+          title: THOUGHTS_FEED_TITLE,
+          href: THOUGHTS_FEED_PATH,
         },
       ],
       scripts: [

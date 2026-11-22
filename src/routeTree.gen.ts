@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as OgSplatRouteImport } from './routes/og/$'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
@@ -48,6 +49,11 @@ const AboutRoute = AboutRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RssDotxmlRoute = RssDotxmlRouteImport.update({
+  id: '/rss.xml',
+  path: '/rss.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/api/health': typeof ApiHealthRoute
   '/og/$': typeof OgSplatRoute
   '/projects/$slug': typeof ProjectsSlugRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/api/health': typeof ApiHealthRoute
   '/og/$': typeof OgSplatRoute
   '/projects/$slug': typeof ProjectsSlugRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/api/health': typeof ApiHealthRoute
   '/og/$': typeof OgSplatRoute
   '/projects/$slug': typeof ProjectsSlugRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/login'
+    | '/rss.xml'
     | '/api/health'
     | '/og/$'
     | '/projects/$slug'
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/login'
+    | '/rss.xml'
     | '/api/health'
     | '/og/$'
     | '/projects/$slug'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/login'
+    | '/rss.xml'
     | '/api/health'
     | '/og/$'
     | '/projects/$slug'
@@ -288,6 +300,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
+  RssDotxmlRoute: typeof RssDotxmlRoute
   ApiHealthRoute: typeof ApiHealthRoute
   OgSplatRoute: typeof OgSplatRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
@@ -326,6 +339,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rss.xml': {
+      id: '/rss.xml'
+      path: '/rss.xml'
+      fullPath: '/rss.xml'
+      preLoaderRoute: typeof RssDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/health': {
@@ -488,6 +508,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
+  RssDotxmlRoute: RssDotxmlRoute,
   ApiHealthRoute: ApiHealthRoute,
   OgSplatRoute: OgSplatRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,
