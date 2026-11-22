@@ -1,0 +1,58 @@
+# Local development stack. `docker compose up`, then open http://localhost:3000.
+#
+#   app       TanStack Start dev server; the source is mounted, so edits hot-reload
+#   postgres  database; pending migrations run each time the app starts
+#
+# The app still reads the rest of its settings (BETTER_AUTH_*, DQC_*, ...) from
+# .env; the values below replace the same names from there. Every credential
+# here is a fixed dev value for this stack only; never reuse one elsewhere.
+#
+# To run the dev server on the host instead, start only the database
+# (`docker compose up postgres`) and point DATABASE_URL in .env at it.
+#
+# The Postgres host port can be moved with POSTGRES_PORT (set it in the shell
+# or .env). `docker compose down -v` deletes the database and the installed
+# node_modules.
+
+name: dqc-main
+
+services:
+  app:
+    image: node:26-trixie-slim
+    working_dir: /app
+    command: ["sh", "docker/dev-entrypoint.sh"]
+    init: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      # Linux builds of the dependencies, kept apart from the host's.
+      - app-node-modules:/app/node_modules
+      - npm-cache:/root/.npm
+    environment:
+      DATABASE_URL: postgresql://dqc:dqc@postgres:5432/dqc
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: dqc
+      POSTGRES_PASSWORD: dqc
+      POSTGRES_DB: dqc
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # Postgres 18+ images keep their data under /var/lib/postgresql/<major>.
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dqc -d dqc"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  app-node-modules:
+  npm-cache:
+  postgres-data:
