@@ -22,8 +22,15 @@ export const buttonVariants = cva(
           "hover:bg-white hover:text-zinc-800 focus:bg-white focus:text-zinc-800 focus:outline-white",
         success:
           "border-emerald-200 hover:bg-emerald-300 hover:text-emerald-800 focus:bg-emerald-300 focus:text-emerald-800 focus:outline-emerald-300",
+        /** Cautionary actions that can be taken back, e.g. Unpublish. */
         warning:
           "border-yellow-200 hover:bg-yellow-300 hover:text-yellow-800 focus:bg-yellow-300 focus:text-yellow-800 focus:outline-yellow-300",
+        /** Destructive actions that can't be undone, e.g. confirming a delete. */
+        danger:
+          "border-rose-200 hover:bg-rose-300 hover:text-rose-800 focus:bg-rose-300 focus:text-rose-800 focus:outline-rose-300",
+        /** No border until hovered or focused, for quiet actions in busy rows and toolbars. */
+        ghost:
+          "border-transparent hover:bg-neutral-800 focus:bg-neutral-800 focus:outline-white",
       },
     },
     defaultVariants: {
