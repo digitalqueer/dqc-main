@@ -173,8 +173,10 @@ function Content({ children, className, ...props }: ContentProps) {
         <div
           {...props}
           id={id}
+          // z-20 keeps the menu above what comes after it. Without it, a later
+          // element that makes its own layer is drawn over the menu.
           className={cn(
-            "flex max-w-[clamp(0rem,calc(100dvw-(--spacing(8))),var(--container-lg))] flex-wrap gap-2 border bg-neutral-900 p-2 focus:outline-none md:gap-1",
+            "z-20 flex max-w-[clamp(0rem,calc(100dvw-(--spacing(8))),var(--container-lg))] flex-wrap gap-2 border bg-neutral-900 p-2 focus:outline-none md:gap-1",
             {
               "flex-row items-stretch": context.direction === "horizontal",
               "flex-col items-start": context.direction === "vertical",
