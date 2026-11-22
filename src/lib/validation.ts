@@ -28,6 +28,42 @@ export const optionalText = (max: number) =>
     .max(max)
     .transform((value) => value || null);
 
+/**
+ * Comma-separated text → a list of tags: lowercase, without a leading "#",
+ * blanks and repeats dropped.
+ */
+export const tagList = (max_tags: number, max_length: number) =>
+  z
+    .string()
+    .transform((value) => [
+      ...new Set(
+        value
+          .split(",")
+          .map((tag) => tag.trim().replace(/^#+\s*/, "").toLowerCase())
+          .filter(Boolean),
+      ),
+    ])
+    .pipe(
+      z
+        .array(
+          z
+            .string()
+            .max(max_length, `Keep each tag under ${max_length} characters`),
+        )
+        .max(max_tags, `At most ${max_tags} tags`),
+    );
+
+/** A ?tag= filter from the URL. A bad value is dropped rather than throwing. */
+export const tagFilter = (max_length: number) =>
+  z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1)
+    .max(max_length)
+    .optional()
+    .catch(undefined);
+
 export const optionalUrl = z
   .union([z.literal(""), z.url("Enter a full URL, e.g. https://…")])
   .transform((value) => value || null);

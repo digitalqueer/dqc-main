@@ -21,6 +21,7 @@ import { Route as ThoughtsIndexRouteImport } from './routes/thoughts/index'
 import { Route as ThoughtsSlugRouteImport } from './routes/thoughts/$slug'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthenticatedDashboardMediaIndexRouteImport } from './routes/_authenticated/dashboard/media/index'
 import { Route as AuthenticatedDashboardPostsIndexRouteImport } from './routes/_authenticated/dashboard/posts/index'
 import { Route as AuthenticatedDashboardPostsPostIdRouteImport } from './routes/_authenticated/dashboard/posts/$postId'
 import { Route as AuthenticatedDashboardProjectsIndexRouteImport } from './routes/_authenticated/dashboard/projects/index'
@@ -89,6 +90,12 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardMediaIndexRoute =
+  AuthenticatedDashboardMediaIndexRouteImport.update({
+    id: '/dashboard/media/',
+    path: '/dashboard/media/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardPostsIndexRoute =
   AuthenticatedDashboardPostsIndexRouteImport.update({
     id: '/dashboard/posts/',
@@ -147,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/posts/$postId': typeof AuthenticatedDashboardPostsPostIdRoute
   '/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
   '/dashboard/team/$memberId': typeof AuthenticatedDashboardTeamMemberIdRoute
+  '/dashboard/media/': typeof AuthenticatedDashboardMediaIndexRoute
   '/dashboard/posts/': typeof AuthenticatedDashboardPostsIndexRoute
   '/dashboard/projects/': typeof AuthenticatedDashboardProjectsIndexRoute
   '/dashboard/requests/': typeof AuthenticatedDashboardRequestsIndexRoute
@@ -167,6 +175,7 @@ export interface FileRoutesByTo {
   '/dashboard/posts/$postId': typeof AuthenticatedDashboardPostsPostIdRoute
   '/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
   '/dashboard/team/$memberId': typeof AuthenticatedDashboardTeamMemberIdRoute
+  '/dashboard/media': typeof AuthenticatedDashboardMediaIndexRoute
   '/dashboard/posts': typeof AuthenticatedDashboardPostsIndexRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsIndexRoute
   '/dashboard/requests': typeof AuthenticatedDashboardRequestsIndexRoute
@@ -189,6 +198,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/posts/$postId': typeof AuthenticatedDashboardPostsPostIdRoute
   '/_authenticated/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
   '/_authenticated/dashboard/team/$memberId': typeof AuthenticatedDashboardTeamMemberIdRoute
+  '/_authenticated/dashboard/media/': typeof AuthenticatedDashboardMediaIndexRoute
   '/_authenticated/dashboard/posts/': typeof AuthenticatedDashboardPostsIndexRoute
   '/_authenticated/dashboard/projects/': typeof AuthenticatedDashboardProjectsIndexRoute
   '/_authenticated/dashboard/requests/': typeof AuthenticatedDashboardRequestsIndexRoute
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/dashboard/posts/$postId'
     | '/dashboard/projects/$projectId'
     | '/dashboard/team/$memberId'
+    | '/dashboard/media/'
     | '/dashboard/posts/'
     | '/dashboard/projects/'
     | '/dashboard/requests/'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/dashboard/posts/$postId'
     | '/dashboard/projects/$projectId'
     | '/dashboard/team/$memberId'
+    | '/dashboard/media'
     | '/dashboard/posts'
     | '/dashboard/projects'
     | '/dashboard/requests'
@@ -252,6 +264,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/posts/$postId'
     | '/_authenticated/dashboard/projects/$projectId'
     | '/_authenticated/dashboard/team/$memberId'
+    | '/_authenticated/dashboard/media/'
     | '/_authenticated/dashboard/posts/'
     | '/_authenticated/dashboard/projects/'
     | '/_authenticated/dashboard/requests/'
@@ -358,6 +371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/media/': {
+      id: '/_authenticated/dashboard/media/'
+      path: '/dashboard/media'
+      fullPath: '/dashboard/media/'
+      preLoaderRoute: typeof AuthenticatedDashboardMediaIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/posts/': {
       id: '/_authenticated/dashboard/posts/'
       path: '/dashboard/posts'
@@ -415,6 +435,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardPostsPostIdRoute: typeof AuthenticatedDashboardPostsPostIdRoute
   AuthenticatedDashboardProjectsProjectIdRoute: typeof AuthenticatedDashboardProjectsProjectIdRoute
   AuthenticatedDashboardTeamMemberIdRoute: typeof AuthenticatedDashboardTeamMemberIdRoute
+  AuthenticatedDashboardMediaIndexRoute: typeof AuthenticatedDashboardMediaIndexRoute
   AuthenticatedDashboardPostsIndexRoute: typeof AuthenticatedDashboardPostsIndexRoute
   AuthenticatedDashboardProjectsIndexRoute: typeof AuthenticatedDashboardProjectsIndexRoute
   AuthenticatedDashboardRequestsIndexRoute: typeof AuthenticatedDashboardRequestsIndexRoute
@@ -429,6 +450,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardProjectsProjectIdRoute,
   AuthenticatedDashboardTeamMemberIdRoute:
     AuthenticatedDashboardTeamMemberIdRoute,
+  AuthenticatedDashboardMediaIndexRoute: AuthenticatedDashboardMediaIndexRoute,
   AuthenticatedDashboardPostsIndexRoute: AuthenticatedDashboardPostsIndexRoute,
   AuthenticatedDashboardProjectsIndexRoute:
     AuthenticatedDashboardProjectsIndexRoute,

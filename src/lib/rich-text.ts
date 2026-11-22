@@ -4,6 +4,7 @@
 // public renderer stays out of the editor's bundle. Keep imports relative:
 // drizzle-kit loads this file through the database schema.
 import * as z from "zod";
+import { isMediaId } from "./media";
 
 export type JsonValue =
   | string
@@ -72,11 +73,78 @@ export function isSafeUrl(url: string) {
   }
 }
 
-/** True when the document has any visible text. */
+/**
+ * The node type for an image from the media library. The document stores
+ * `{ type: "image", mediaId }`, plus `caption` when this use of the image has
+ * its own: alt text, the library caption, and URLs (which are signed and
+ * depend on server config) are looked up when it's shown.
+ */
+export const RICH_TEXT_IMAGE_TYPE = "image";
+
+/** Images after this many in one document aren't looked up (or shown). */
+export const RICH_TEXT_MAX_IMAGES = 200;
+
+/** An image as a document shows it, resolved from the media library. */
+export interface RichTextMedia {
+  alt: string | null;
+  caption: string | null;
+  image: {
+    src: string;
+    srcSet: string;
+    /** The original's size, for the aspect ratio; null if it wasn't known. */
+    width: number | null;
+    height: number | null;
+  };
+}
+
+/** A document's images by media id. An image missing from it isn't shown. */
+export type RichTextMediaMap = Record<string, RichTextMedia>;
+
+/**
+ * The media id of an image node, or null for any other node. Only images at
+ * the top level of a document are shown, so only pass top-level nodes.
+ */
+export function imageMediaId(node: SerializedRichTextNode | null | undefined) {
+  return node?.type === RICH_TEXT_IMAGE_TYPE && isMediaId(node.mediaId)
+    ? node.mediaId
+    : null;
+}
+
+/**
+ * The caption an image shows: its own `caption` for this document when it
+ * has one ("" means none), otherwise the library's.
+ */
+export function effectiveCaption(own: unknown, library_caption: string | null) {
+  return typeof own === "string" ? own.trim() || null : library_caption;
+}
+
+/** The media ids of the images in these documents, without duplicates. */
+export function collectMediaIds(
+  documents: ReadonlyArray<RichTextDocument | null | undefined>,
+) {
+  const ids = new Set<string>();
+  for (const document of documents) {
+    const nodes = document?.root?.children;
+    if (!Array.isArray(nodes)) continue;
+    let count = 0;
+    for (const node of nodes) {
+      const id = imageMediaId(node);
+      if (!id) continue;
+      ids.add(id);
+      if (++count >= RICH_TEXT_MAX_IMAGES) break;
+    }
+  }
+  return [...ids];
+}
+
+/** True when the document has any visible text, or an image. */
 export function hasRichTextContent(
   document: RichTextDocument | null | undefined,
 ) {
   if (!document) return false;
+  if (document.root.children.some((node) => imageMediaId(node) !== null)) {
+    return true;
+  }
   const visit = (node: SerializedRichTextNode): boolean =>
     (typeof node.text === "string" && node.text.trim() !== "") ||
     (Array.isArray(node.children) && node.children.some(visit));
