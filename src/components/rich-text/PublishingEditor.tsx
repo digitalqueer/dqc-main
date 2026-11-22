@@ -11,16 +11,43 @@ import { useConfirm } from "../_ui/AlertDialog";
 import Button from "../_ui/Button";
 import { LocalTime } from "../_ui/LocalTime";
 import { useToast } from "../_ui/Toast";
+import {
+  type MediaViewStore,
+  useCreateMediaViewStore,
+  useRichTextMediaMap,
+} from "./mediaViewStore";
 import { RICH_TEXT_PROSE } from "./richTextClasses";
 import { RichTextEditor } from "./RichTextEditor";
 import { RichTextRenderer } from "./RichTextRenderer";
 import {
+  type RichTextSnapshot,
   useRichTextDocument,
   useSaveShortcut,
   useUnsavedChangesGuard,
 } from "./useRichTextDocument";
 
 type Action = "save" | "publish" | "unpublish";
+
+/** The draft as it will look published, with images from the editor's store. */
+function DraftPreview({
+  snapshot,
+  media_store,
+  heading_shift,
+}: {
+  snapshot: RichTextSnapshot;
+  media_store: MediaViewStore;
+  heading_shift?: number;
+}) {
+  const media = useRichTextMediaMap(media_store, snapshot.document);
+  return (
+    <RichTextRenderer
+      document={snapshot.document}
+      media={media}
+      heading_shift={heading_shift}
+      className={RICH_TEXT_PROSE}
+    />
+  );
+}
 
 function StatusLine({
   status,
@@ -102,6 +129,8 @@ export function PublishingEditor({
   const [is_previewing, set_is_previewing] = useState(false);
   const draft = useRichTextDocument();
   const { is_dirty } = draft;
+  // Shared by the editor and the preview, so images aren't looked up twice.
+  const media_store = useCreateMediaViewStore();
   const Noun = noun.charAt(0).toUpperCase() + noun.slice(1);
 
   const write = async (action: "save" | "publish") => {
@@ -241,6 +270,7 @@ export function PublishingEditor({
             on_change={draft.on_change}
             label={editor_label}
             placeholder={placeholder}
+            media_store={media_store}
           />
         </div>
         {is_previewing && (
@@ -249,10 +279,10 @@ export function PublishingEditor({
             className="border border-dashed border-neutral-700 p-4"
           >
             {preview && (
-              <RichTextRenderer
-                document={preview.document}
+              <DraftPreview
+                snapshot={preview}
+                media_store={media_store}
                 heading_shift={heading_shift}
-                className={RICH_TEXT_PROSE}
               />
             )}
           </section>
@@ -263,7 +293,8 @@ export function PublishingEditor({
         <code>###</code> subheading, <code>-</code> or <code>1.</code> list, <code>&gt;</code> quote,{" "}
         <code>```</code> code block, <code>**bold**</code>,{" "}
         <code>*italic*</code>, <code>`code`</code>. Press ⌘/Ctrl+K to add a
-        link and ⌘/Ctrl+S to save the draft.
+        link and ⌘/Ctrl+S to save the draft. The image button adds an image
+        from the media library.
       </p>
     </>
   );

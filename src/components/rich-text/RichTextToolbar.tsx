@@ -47,6 +47,7 @@ import { type KeyboardEvent, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import Button from "../_ui/Button";
 import { Select } from "../_ui/Select";
+import { ImagePicker } from "./ImagePicker";
 import { LinkPopover } from "./LinkPopover";
 
 const BLOCK_TYPES = {
@@ -289,6 +290,7 @@ export function RichTextToolbar({ controls, className }: RichTextToolbarProps) {
         className={TOOLBAR_BUTTON}
         active_className={TOOLBAR_BUTTON_ACTIVE}
       />
+      <ImagePicker disabled={in_code_block} className={TOOLBAR_BUTTON} />
       <Separator />
       <Button
         size="icon"

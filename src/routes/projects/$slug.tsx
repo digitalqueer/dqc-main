@@ -23,7 +23,7 @@ export const Route = createFileRoute("/projects/$slug")({
 });
 
 function RouteComponent() {
-  const { project, content } = Route.useLoaderData();
+  const { project, content, media } = Route.useLoaderData();
 
   return (
     <Main>
@@ -34,6 +34,7 @@ function RouteComponent() {
         {/* Wrapped, so prose's no-margin-on-the-first-child rule needs repeating. */}
         <RichTextRenderer
           document={content}
+          media={media}
           className="rich-text [&>:first-child]:mt-0"
         />
       </Prose>

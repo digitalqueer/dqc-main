@@ -4,11 +4,11 @@ import Definition from "@/components/_ui/Definition";
 import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
 import { RichTextRenderer } from "@/components/rich-text/RichTextRenderer";
-import { listPublishedTeam } from "@/server/functions/team.functions";
+import { getPublishedTeam } from "@/server/functions/team.functions";
 
 export const Route = createFileRoute("/about")({
   // Everyone with a published bio, in the order set on the admin Team page.
-  loader: () => listPublishedTeam(),
+  loader: () => getPublishedTeam(),
   head: () => ({
     meta: [{ title: "About - Digital Queer Collective" }],
   }),
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/about")({
 });
 
 function RouteComponent() {
-  const team = Route.useLoaderData();
+  const { members: team, media } = Route.useLoaderData();
 
   return (
     <Main>
@@ -98,6 +98,7 @@ function RouteComponent() {
                     first paragraph sits right under the name, as `h3 + p` does. */}
                 <RichTextRenderer
                   document={member.bio}
+                  media={media}
                   heading_shift={1}
                   className="rich-text [&>:first-child]:mt-0"
                 />

@@ -20,4 +20,11 @@ export const RICH_TEXT_CLASSES = {
     "not-prose block my-6 overflow-x-auto whitespace-pre border border-neutral-700 bg-neutral-950 p-4 text-sm leading-relaxed",
   // Lexical nests a list inside an extra <li>; hide that item's marker.
   nested_list_item: "list-none",
+  // Tall images are capped to the screen, keeping their aspect ratio.
+  image: "mx-auto block h-auto w-auto max-w-full max-h-[80vh]",
+  figcaption: "text-center",
 } as const;
+
+/** How wide a document's images are shown (Main's width, less its padding). */
+export const RICH_TEXT_IMAGE_SIZES =
+  "(min-width: 56rem) 53rem, calc(100vw - 3rem)";

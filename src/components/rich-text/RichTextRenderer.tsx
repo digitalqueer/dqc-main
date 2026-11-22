@@ -1,15 +1,20 @@
 // Renders a stored rich-text document (Lexical's serialized JSON) as plain
 // React elements, on the server and client alike, without loading Lexical.
 // Stored JSON is treated as untrusted: only known node types and fields are
-// rendered, and links must pass `isSafeUrl`.
+// rendered, links must pass `isSafeUrl`, and images come only from the
+// server-resolved `media` map (the document holds just their ids).
 import { type CSSProperties, createContext, type ReactNode, useContext } from "react";
 import {
+  effectiveCaption,
+  imageMediaId,
   isSafeUrl,
   type RichTextDocument,
+  type RichTextMediaMap,
   type SerializedRichTextNode,
   toRichTextHeadingTag,
 } from "@/lib/rich-text";
 import { RICH_TEXT_CLASSES } from "./richTextClasses";
+import { RichTextFigure } from "./RichTextFigure";
 
 // Lexical's text format bit flags.
 const IS_BOLD = 1;
@@ -28,6 +33,9 @@ const TEXT_ALIGNMENTS = new Set(["left", "center", "right", "justify", "start", 
 
 /** How many levels to push headings down, e.g. 1 under an h3 (h3 → h4). */
 const HeadingShiftContext = createContext(0);
+
+const NO_MEDIA: RichTextMediaMap = {};
+const MediaContext = createContext(NO_MEDIA);
 
 function children_of(node: SerializedRichTextNode, depth: number) {
   if (!Array.isArray(node.children) || depth >= MAX_DEPTH) return null;
@@ -163,10 +171,28 @@ function RichTextNode({
       );
     }
 
+    case "image":
+      // Top level only (depth 1): a <figure> inside a <p> or <li> would be
+      // invalid HTML. The editor keeps images there.
+      return depth === 1 ? <Image node={node} /> : null;
+
     default:
       // Unknown block or inline: keep its text rather than drop it.
       return <>{children_of(node, depth)}</>;
   }
+}
+
+function Image({ node }: { node: SerializedRichTextNode }) {
+  const media = useContext(MediaContext);
+  const id = imageMediaId(node);
+  const item = id ? media[id] : undefined;
+  // Deleted from the library, or imgproxy isn't set up: leave it out.
+  return item ? (
+    <RichTextFigure
+      media={item}
+      caption={effectiveCaption(node.caption, item.caption)}
+    />
+  ) : null;
 }
 
 /** h3 or h4 (see toRichTextHeadingTag), pushed down by the heading shift. */
@@ -191,17 +217,22 @@ interface RichTextRendererProps {
    * headings render as h3 and h4, under the page's h2 title.
    */
   heading_shift?: number;
+  /** The document's images by media id, from the server (resolveRichTextMedia). */
+  media?: RichTextMediaMap;
   className?: string;
 }
 
 export function RichTextRenderer({
   document,
   heading_shift = 0,
+  media = NO_MEDIA,
   className,
 }: RichTextRendererProps) {
   return (
     <HeadingShiftContext.Provider value={heading_shift}>
-      <div className={className}>{children_of(document.root, 0)}</div>
+      <MediaContext.Provider value={media}>
+        <div className={className}>{children_of(document.root, 0)}</div>
+      </MediaContext.Provider>
     </HeadingShiftContext.Provider>
   );
 }

@@ -10,7 +10,9 @@ import {
   projectSlugSchema,
 } from "@/lib/projects";
 import { hasRichTextContent, toPublishStatus } from "@/lib/rich-text";
+import { resolveRichTextMedia } from "@/server/media/rich-text-media.server";
 import { ensure_auth_middleware } from "@/server/middleware/auth.middleware";
+import { media_middleware } from "@/server/middleware/media.middleware";
 import { projects_middleware } from "@/server/middleware/projects.middleware";
 
 // <-- Public -->
@@ -29,11 +31,12 @@ export const listActiveProjects = createServerFn({ method: "GET" })
   );
 
 /**
- * /projects/{slug}: the project and its published page. A project without a
- * published page has no page to show (the Projects list doesn't link to it).
+ * /projects/{slug}: the project, its published page, and the page's images.
+ * A project without a published page has no page to show (the Projects list
+ * doesn't link to it).
  */
 export const getPublishedProjectPage = createServerFn({ method: "GET" })
-  .middleware([projects_middleware])
+  .middleware([projects_middleware, media_middleware])
   .validator(projectSlugSchema)
   .handler(async ({ context, data }) => {
     const [project, page] = await Promise.all([
@@ -47,6 +50,7 @@ export const getPublishedProjectPage = createServerFn({ method: "GET" })
       project,
       content: page.publishedContent,
       publishedAt: page.publishedAt,
+      media: await resolveRichTextMedia(context.media, [page.publishedContent]),
     };
   });
 
