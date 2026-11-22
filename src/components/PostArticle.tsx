@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Prose from "@/components/_ui/Prose";
 import { PublishedDate } from "@/components/_ui/PublishedDate";
 import { RichTextRenderer } from "@/components/rich-text/RichTextRenderer";
+import { pageMeta } from "@/lib/share";
 import type { getPublishedPost } from "@/server/functions/posts.functions";
 
 type PublishedPost = Awaited<ReturnType<typeof getPublishedPost>>;
@@ -46,15 +47,13 @@ export function PostArticle({
   );
 }
 
-/** <title> and description for a published post's page. */
+/** <title>, description and link-preview tags for a published post's page. */
 export function postHead(loaderData: PublishedPost | undefined) {
   if (!loaderData) return {};
   const { title, description, excerpt } = loaderData.post;
-  const summary = description ?? excerpt;
   return {
     meta: [
-      { title: `${title} - Digital Queer Collective` },
-      ...(summary ? [{ name: "description", content: summary }] : []),
+      ...pageMeta({ title, description: description ?? excerpt }),
       { property: "og:type", content: "article" },
     ],
   };

@@ -19,19 +19,20 @@ The app follows the same structure as [devsharpe](https://github.com/devinsharpe
 
 ## Stack
 
-| Concern    | Choice                                                                                                                                                   |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Framework  | [TanStack Start](https://tanstack.com/start) (React 19, TanStack Router file routes, server functions), built with Vite and Nitro (`node-server` preset) |
-| Database   | Postgres, with [Drizzle ORM](https://orm.drizzle.team) (1.0 RC) and drizzle-kit migrations                                                               |
-| Validation | Zod 4, shared by forms and server functions                                                                                                              |
-| Forms      | TanStack Form (`@tanstack/react-form-start`)                                                                                                             |
-| Rich text  | [Lexical](https://lexical.dev), stored as its JSON editor state                                                                                          |
-| Auth       | [Better Auth](https://better-auth.com) with a generic OAuth provider (DQC's sign-in service)                                                             |
-| Media      | Any S3-compatible bucket (RustFS locally), rendered through [imgproxy](https://imgproxy.net)                                                             |
-| Styling    | Tailwind CSS v4 and `@tailwindcss/typography`                                                                                                            |
-| Bot check  | Cloudflare Turnstile on the contact form                                                                                                                 |
-| Mail       | Resend, for people who opt in to communications on the contact form                                                                                      |
-| Analytics  | Plausible (self-hosted), loaded from the root route                                                                                                      |
+| Concern      | Choice                                                                                                                                                   |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework    | [TanStack Start](https://tanstack.com/start) (React 19, TanStack Router file routes, server functions), built with Vite and Nitro (`node-server` preset) |
+| Database     | Postgres, with [Drizzle ORM](https://orm.drizzle.team) (1.0 RC) and drizzle-kit migrations                                                               |
+| Validation   | Zod 4, shared by forms and server functions                                                                                                              |
+| Forms        | TanStack Form (`@tanstack/react-form-start`)                                                                                                             |
+| Rich text    | [Lexical](https://lexical.dev), stored as its JSON editor state                                                                                          |
+| Auth         | [Better Auth](https://better-auth.com) with a generic OAuth provider (DQC's sign-in service)                                                             |
+| Media        | Any S3-compatible bucket (RustFS locally), rendered through [imgproxy](https://imgproxy.net)                                                             |
+| Share images | [satori](https://github.com/vercel/satori) and [resvg](https://github.com/yisibl/resvg-js) (both WebAssembly) draw the link-preview cards                |
+| Styling      | Tailwind CSS v4 and `@tailwindcss/typography`                                                                                                            |
+| Bot check    | Cloudflare Turnstile on the contact form                                                                                                                 |
+| Mail         | Resend, for people who opt in to communications on the contact form                                                                                      |
+| Analytics    | Plausible (self-hosted), loaded from the root route                                                                                                      |
 
 ## Getting started
 
@@ -91,6 +92,7 @@ See [`.env.example`](.env.example) for every variable, with comments. Server cod
 | `S3_BUCKET`, `S3_REGION`, `S3_ENDPOINT`, `S3_PUBLIC_ENDPOINT`, `S3_FORCE_PATH_STYLE`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Media uploads                                                                        | Uploads are switched off, and the media library says what's missing    |
 | `S3_CORS_ORIGINS`                                                                                                                | Optional: origins allowed to upload, applied to the bucket when the container starts | The bucket's CORS rules are left alone                                 |
 | `IMGPROXY_URL`, `IMGPROXY_KEY`, `IMGPROXY_SALT`, `IMGPROXY_SOURCE_PREFIX`                                                        | Showing images                                                                       | Images are left out of pages                                           |
+| `SITE_URL`                                                                                                                       | The public origin for absolute links in link previews                                | Falls back to `BETTER_AUTH_URL`, then to the request's origin          |
 
 ## Project layout
 
@@ -112,6 +114,7 @@ See [`.env.example`](.env.example) for every variable, with comments. Server cod
     │   ├── _authenticated.tsx  Sign-in guard for the admin pages
     │   ├── _authenticated/   Admin: /dashboard and its requests, posts, projects, team and media pages
     │   ├── thoughts/, statements/, projects/  Published content (see Content)
+    │   ├── og/               Server route: share cards (/og/*)
     │   └── api/              Server routes: auth, health
     ├── components/           _ui/ holds the primitives (Button, Dialog, AlertDialog, Toast, form fields, …)
     │   ├── forms/            Admin forms, built with useAppForm (src/forms/context.form.ts)
@@ -124,6 +127,7 @@ See [`.env.example`](.env.example) for every variable, with comments. Server cod
     │   ├── repositories/     Database access, one class per table (*.repository.server.ts)
     │   ├── database/         Drizzle client, schema, relations, migrator
     │   ├── media/            The bucket, imgproxy URLs, and media as pages see it
+    │   ├── og/               Share cards: the design, drawing, responses
     │   ├── auth.server.ts    Better Auth instance
     │   ├── resend.server.ts  Adds people who opt in to Resend's contacts
     │   ├── turnstile.server.ts  Checks Turnstile tokens with Cloudflare
@@ -147,7 +151,7 @@ flowchart LR
 
 - **Request middleware** ([`src/start.ts`](src/start.ts)) wraps everything the server handles. `requestLogger` logs `[id] METHOD /path 12ms` and sets an `x-request-id` header. `createCsrfMiddleware` guards server function calls.
 - **Server functions** are the app's only API for pages. Each one declares its middleware (auth first for admin functions, then the repositories it needs in `context`) and a Zod validator, then calls into a repository.
-- **Server routes** handle raw HTTP that isn't page data: the Better Auth handler and `/api/health`.
+- **Server routes** handle raw HTTP that isn't page data: the Better Auth handler, `/api/health` and the share cards.
 
 ## Authentication
 
@@ -244,6 +248,28 @@ sequenceDiagram
 - **The bucket stays private.** Browsers upload with presigned URLs and imgproxy reads with its own credentials. imgproxy URLs are signed with `IMGPROXY_KEY` and `IMGPROXY_SALT` on the server ([`imgproxy.server.ts`](src/server/media/imgproxy.server.ts)), so only this server can ask for an image, or a size of one.
 - **Responsive images.** [`media-views.server.ts`](src/server/media/media-views.server.ts) turns rows into `src` and `srcSet` at 640, 1280, 1920 and 2560px, skipping widths larger than the original, plus a 480px thumbnail for the library.
 - **Without the services.** With no bucket configured, uploads are switched off; without imgproxy, the library shows file names instead of previews. The media page says which variables are missing.
+
+## Link previews
+
+When a page is shared in Slack, iMessage, Bluesky and the like, the preview comes from its Open Graph tags. Every page has them.
+
+**The defaults** come from the root route's `head` ([`__root.tsx`](src/routes/__root.tsx)):
+
+- `og:title` is the site's name, and the description is the home page's opening line.
+- `og:url` and the image are absolute URLs on `SITE_URL` (see [Environment](#environment) for its fallbacks).
+- `og:image` is the page's generated share card.
+- The title, description, URL and image also go out as X's `twitter:` tags, and `twitter:card` is `summary_large_image`. X reads the `og:` tags when its own are missing, but other readers and SEO checkers look for both.
+
+A page's own `head` wins, tag by tag. Pages set theirs with `pageMeta({ title, description })` from [`src/lib/share.ts`](src/lib/share.ts). It sets the `og:` and `twitter:` tags, the description, and the `<title>`, which gets " - Digital Queer Collective" after it. Posts also set `og:type` to `article`.
+
+**Share cards** are 1200 × 630 PNGs at `/og` plus the page's path: `/og/thoughts/2026` is the card for `/thoughts/2026`. Open one in the browser to see it. The card shows the site's name and host along the top, then the page's breadcrumbs: the last crumb as the title, the ones before it above that. The home page's card says "Building an Infrastructure for Change".
+
+- **The text comes from the path, never from the request.** The card matches the path against the router, then looks up the page's crumbs in `PAGE_CRUMBS` in [`cards.server.tsx`](src/server/og/cards.server.tsx). So nobody can put their own words on a card served from this site. Titles (a post's, a project's) come from published content only: a draft's card shows its section instead. Paths that aren't pages, the admin pages, the APIs and `/og` itself are a 404.
+- **New pages.** Add the page's crumbs to `PAGE_CRUMBS`, matching its breadcrumbs. A page that isn't listed gets the home page's card.
+- **The design** is in [`designs.server.tsx`](src/server/og/designs.server.tsx): a satori element tree with inline styles and flexbox, not a page component. Bump `DESIGN_VERSION` in `cards.server.tsx` when you change it, so its `ETag` changes. The text is drawn with Nudica, the site's own font, and it's the only font: text in a script Nudica doesn't cover won't show.
+- **Caching.** Cards are cached for a day, with an `ETag`. Each process also keeps the last 100 cards it drew, so a card is usually drawn once. Drawing one takes about 15 ms, plus about 100 ms for the first after a start.
+
+**How they're drawn.** [satori](https://github.com/vercel/satori) lays out the element tree and turns it into an SVG, with text as paths. [resvg](https://github.com/yisibl/resvg-js) turns the SVG into a PNG ([`render.server.ts`](src/server/og/render.server.ts)). Both are WebAssembly, so the build is the same on every platform. The image has no `node_modules`, so resvg's `.wasm` and the font are built into the server bundle with a `?base64` import, a small plugin in [`vite.config.ts`](vite.config.ts). The renderer is a separate 3.4 MB chunk, loaded on the first card a process draws.
 
 ## Migrations
 

@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as OgSplatRouteImport } from './routes/og/$'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects/$slug'
 import { Route as StatementsSlugRouteImport } from './routes/statements/$slug'
@@ -52,6 +53,11 @@ const LoginRoute = LoginRouteImport.update({
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
   path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OgSplatRoute = OgSplatRouteImport.update({
+  id: '/og/$',
+  path: '/og/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/api/health': typeof ApiHealthRoute
+  '/og/$': typeof OgSplatRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/statements/$slug': typeof StatementsSlugRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/api/health': typeof ApiHealthRoute
+  '/og/$': typeof OgSplatRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/statements/$slug': typeof StatementsSlugRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/api/health': typeof ApiHealthRoute
+  '/og/$': typeof OgSplatRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/statements/$slug': typeof StatementsSlugRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/api/health'
+    | '/og/$'
     | '/projects/$slug'
     | '/statements/$slug'
     | '/thoughts/$slug'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/api/health'
+    | '/og/$'
     | '/projects/$slug'
     | '/statements/$slug'
     | '/thoughts/$slug'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/api/health'
+    | '/og/$'
     | '/projects/$slug'
     | '/statements/$slug'
     | '/thoughts/$slug'
@@ -277,6 +289,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  OgSplatRoute: typeof OgSplatRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
   StatementsSlugRoute: typeof StatementsSlugRoute
   ThoughtsSlugRoute: typeof ThoughtsSlugRoute
@@ -320,6 +333,13 @@ declare module '@tanstack/react-router' {
       path: '/api/health'
       fullPath: '/api/health'
       preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/og/$': {
+      id: '/og/$'
+      path: '/og/$'
+      fullPath: '/og/$'
+      preLoaderRoute: typeof OgSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects/': {
@@ -469,6 +489,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
   ApiHealthRoute: ApiHealthRoute,
+  OgSplatRoute: OgSplatRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,
   StatementsSlugRoute: StatementsSlugRoute,
   ThoughtsSlugRoute: ThoughtsSlugRoute,

@@ -4,12 +4,13 @@ import Link from "@/components/_ui/Link";
 import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
 import { PublishedDate } from "@/components/_ui/PublishedDate";
+import { pageMeta } from "@/lib/share";
 import { listPublishedThoughts } from "@/server/functions/posts.functions";
 
 export const Route = createFileRoute("/thoughts/")({
   loader: () => listPublishedThoughts(),
   head: () => ({
-    meta: [{ title: "Thoughts - Digital Queer Collective" }],
+    meta: pageMeta({ title: "Thoughts" }),
   }),
   component: RouteComponent,
 });

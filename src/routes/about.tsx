@@ -4,13 +4,14 @@ import Definition from "@/components/_ui/Definition";
 import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
 import { RichTextRenderer } from "@/components/rich-text/RichTextRenderer";
+import { pageMeta } from "@/lib/share";
 import { getPublishedTeam } from "@/server/functions/team.functions";
 
 export const Route = createFileRoute("/about")({
   // Everyone with a published bio, in the order set on the admin Team page.
   loader: () => getPublishedTeam(),
   head: () => ({
-    meta: [{ title: "About - Digital Queer Collective" }],
+    meta: pageMeta({ title: "About" }),
   }),
   component: RouteComponent,
 });
