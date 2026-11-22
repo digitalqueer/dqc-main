@@ -1,7 +1,7 @@
 import {
-  ComponentProps,
+  type ComponentProps,
   createContext,
-  ReactNode,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import Button, { ButtonProps } from "@/components/_ui/Button";
+import Button, { type ButtonProps } from "@/components/_ui/Button";
 import { ClientOnly, useLayoutEffect } from "@tanstack/react-router";
 import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";

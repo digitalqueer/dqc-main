@@ -110,13 +110,14 @@ function ProjectForm({
                 syncing_slug.current = false;
               },
             }}
-            children={(field) => (
+          >
+            {(field) => (
               <field.TextField
                 label="Name"
                 placeholder="Trans Formations Data Archive"
               />
             )}
-          />
+          </form.AppField>
           <form.AppField
             name="id"
             listeners={{
@@ -125,7 +126,8 @@ function ProjectForm({
                 if (!syncing_slug.current) slug_edited.current = value !== "";
               },
             }}
-            children={(field) => (
+          >
+            {(field) => (
               <field.TextField
                 label="Slug (/projects/…)"
                 placeholder="tfp"
@@ -135,50 +137,44 @@ function ProjectForm({
                 }
               />
             )}
-          />
-          <form.AppField
-            name="status"
-            children={(field) => (
+          </form.AppField>
+          <form.AppField name="status">
+            {(field) => (
               <field.SelectField label="Status" options={STATUS_OPTIONS} />
             )}
-          />
+          </form.AppField>
           <div className="grid grid-cols-2 gap-2">
-            <form.AppField
-              name="startDate"
-              children={(field) => (
+            <form.AppField name="startDate">
+              {(field) => (
                 <field.TextField label="Start" placeholder="Spring 2026" />
               )}
-            />
-            <form.AppField
-              name="endDate"
-              children={(field) => (
+            </form.AppField>
+            <form.AppField name="endDate">
+              {(field) => (
                 <field.TextField label="End" placeholder="Blank if ongoing" />
               )}
-            />
+            </form.AppField>
           </div>
-          <form.AppField
-            name="websiteLink"
-            children={(field) => (
+          <form.AppField name="websiteLink">
+            {(field) => (
               <field.TextField
                 label="Website (optional)"
                 type="url"
                 placeholder="https://transformationsproject.org"
               />
             )}
-          />
-          <form.AppField
-            name="sourceLink"
-            children={(field) => (
+          </form.AppField>
+          <form.AppField name="sourceLink">
+            {(field) => (
               <field.TextField
                 label="Source code (optional)"
                 type="url"
                 placeholder="https://github.com/…"
               />
             )}
-          />
-          <form.AppField
-            name="description"
-            children={(field) => (
+          </form.AppField>
+          <form.AppField name="description">
+            {(field) => (
               <field.TextAreaField
                 className="sm:col-span-2"
                 label="Description"
@@ -186,7 +182,7 @@ function ProjectForm({
                 rows={5}
               />
             )}
-          />
+          </form.AppField>
         </div>
         <form.FormActions
           submit_label={is_editing ? "Save Changes" : "Create Project"}

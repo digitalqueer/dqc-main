@@ -24,7 +24,7 @@ import type { MediaItem } from "./MediaLibraryItem";
 type MediaUse = Awaited<ReturnType<typeof getMediaUsage>>[number];
 
 /** What a use is called, e.g. `Thought "2026"` or `Devin Sharpe's bio`. */
-function useLabel(use: MediaUse) {
+function labelOf(use: MediaUse) {
   if (use.kind === "post") {
     return `${POST_KIND_LABELS[use.post_kind]} “${use.title}”`;
   }
@@ -34,7 +34,7 @@ function useLabel(use: MediaUse) {
 
 /** e.g. `Thought "2026" (draft only)`, for the delete confirmation. */
 function describeUse(use: MediaUse) {
-  const name = useLabel(use);
+  const name = labelOf(use);
   return use.is_live ? name : `${name} (draft only)`;
 }
 
@@ -48,7 +48,7 @@ function UseLink({ use }: { use: MediaUse }) {
         params={{ postId: use.id }}
         className={className}
       >
-        {useLabel(use)}
+        {labelOf(use)}
       </Link>
     );
   }
@@ -59,7 +59,7 @@ function UseLink({ use }: { use: MediaUse }) {
         params={{ projectId: use.id }}
         className={className}
       >
-        {useLabel(use)}
+        {labelOf(use)}
       </Link>
     );
   }
@@ -69,7 +69,7 @@ function UseLink({ use }: { use: MediaUse }) {
       params={{ memberId: use.id }}
       className={className}
     >
-      {useLabel(use)}
+      {labelOf(use)}
     </Link>
   );
 }
@@ -233,35 +233,32 @@ function MediaDetails({ item, on_close, on_changed }: MediaDetailsProps) {
           }}
         >
           <div className="grid grid-cols-1 gap-2 pb-4 px-2">
-            <form.AppField
-              name="altText"
-              children={(field) => (
+            <form.AppField name="altText">
+              {(field) => (
                 <field.TextAreaField
                   label="Alt text"
                   placeholder="Describe the image for people who can't see it…"
                   rows={2}
                 />
               )}
-            />
-            <form.AppField
-              name="caption"
-              children={(field) => (
+            </form.AppField>
+            <form.AppField name="caption">
+              {(field) => (
                 <field.TextAreaField
                   label="Caption (optional)"
                   placeholder="Shown under the image where it's published"
                   rows={2}
                 />
               )}
-            />
-            <form.AppField
-              name="tags"
-              children={(field) => (
+            </form.AppField>
+            <form.AppField name="tags">
+              {(field) => (
                 <field.TextField
                   label="Tags (comma-separated)"
                   placeholder="events, team"
                 />
               )}
-            />
+            </form.AppField>
           </div>
           <form.FormActions
             submit_label="Save Changes"

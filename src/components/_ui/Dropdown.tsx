@@ -191,7 +191,7 @@ function Content({ children, className, ...props }: ContentProps) {
         </div>
       </FloatingFocusManager>
     );
-  return <></>;
+  return null;
 }
 
 type ItemButtonProps = { as: "button" } & ButtonProps;
@@ -237,7 +237,7 @@ function Item({ as, children, className, ...props }: ItemProps) {
   );
 
   if (Comp === null) {
-    return <></>;
+    return null;
   }
 
   return (

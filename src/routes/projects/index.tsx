@@ -31,7 +31,10 @@ function Description({ text }: { text: string }) {
     .split(/\n\s*\n/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean)
-    .map((paragraph, index) => <p key={index}>{paragraph}</p>);
+    .map((paragraph, index) => (
+      // biome-ignore lint/suspicious/noArrayIndexKey: paragraphs of a fixed text, never reordered
+      <p key={index}>{paragraph}</p>
+    ));
 }
 
 function ProjectSummary({ project }: { project: PublicProject }) {

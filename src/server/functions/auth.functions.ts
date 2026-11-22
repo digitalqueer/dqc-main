@@ -19,5 +19,5 @@ export const ensureSession = createServerFn({ method: "GET" })
       throw new Error("Unauthorized");
     }
 
-    return { session: context.session!, user: context.user! };
+    return { session: context.session, user: context.user };
   });

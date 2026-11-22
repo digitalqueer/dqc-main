@@ -169,7 +169,10 @@ export function MediaUploader({
   const tags_problem = tagsProblem(tags);
   const field_id = useId();
   const next_key = useRef(0);
-  const waiting = useRef<Upload[]>([]);
+  // Uploads waiting their turn, each with its (supported) content type.
+  const waiting = useRef<{ upload: Upload; content_type: MediaContentType }[]>(
+    [],
+  );
   const active = useRef(0);
   // Uploads outlive the render that started them; always use the latest.
   const latest = useRef({
@@ -234,10 +237,11 @@ export function MediaUploader({
   };
 
   const pump = () => {
-    while (active.current < CONCURRENT_UPLOADS && waiting.current.length > 0) {
-      const upload = waiting.current.shift()!;
+    while (active.current < CONCURRENT_UPLOADS) {
+      const next = waiting.current.shift();
+      if (!next) return;
       active.current += 1;
-      void run(upload, upload.content_type!).finally(() => {
+      void run(next.upload, next.content_type).finally(() => {
         active.current -= 1;
         pump();
       });
@@ -245,7 +249,9 @@ export function MediaUploader({
   };
 
   const enqueue = (upload: Upload) => {
-    waiting.current.push(upload);
+    // An unsupported file fails as it's added and has no retry button.
+    if (!upload.content_type) return;
+    waiting.current.push({ upload, content_type: upload.content_type });
     pump();
   };
 

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
-import { AnyFieldApi } from "@tanstack/react-form-start";
-import { ComponentProps, useMemo } from "react";
+import type { AnyFieldApi } from "@tanstack/react-form-start";
+import { type ComponentProps, useMemo } from "react";
 
 interface FieldInfoProps extends ComponentProps<"span"> {
   field: AnyFieldApi;

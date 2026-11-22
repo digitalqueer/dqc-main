@@ -112,10 +112,11 @@ export async function shareCardContent(
   if (!crumbs) return null;
   const brand = SITE_NAME;
   const host = new URL(resolveSiteOrigin(request_url)).host;
-  if (crumbs.length === 0) {
+  const title = crumbs.at(-1);
+  if (title === undefined) {
     return { brand, host, section: [], title: HOME_TITLE };
   }
-  return { brand, host, section: crumbs.slice(0, -1), title: crumbs.at(-1)! };
+  return { brand, host, section: crumbs.slice(0, -1), title };
 }
 
 /** Recently drawn cards by ETag, so repeat requests skip the drawing. */
@@ -139,9 +140,9 @@ export async function shareCardResponse(request: Request, path: string) {
       CARD_WIDTH,
       CARD_HEIGHT,
     );
-    if (drawn.size >= DRAWN_LIMIT) {
-      drawn.delete(drawn.keys().next().value!);
-    }
+    // A Map keeps insertion order, so the first key is the oldest.
+    const oldest = drawn.keys().next().value;
+    if (drawn.size >= DRAWN_LIMIT && oldest !== undefined) drawn.delete(oldest);
     drawn.set(etag, body);
   }
   return new Response(body as BodyInit, {

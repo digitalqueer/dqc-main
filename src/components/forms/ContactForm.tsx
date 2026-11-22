@@ -87,9 +87,8 @@ export function ContactForm({
       }}
     >
       <div className="flex gap-4">
-        <form.Field
-          name="firstName"
-          children={(field) => (
+        <form.Field name="firstName">
+          {(field) => (
             <fieldset className="w-full">
               <label
                 className="block mb-0.5 ml-0.5"
@@ -109,10 +108,9 @@ export function ContactForm({
               <FieldInfo field={field} />
             </fieldset>
           )}
-        />
-        <form.Field
-          name="lastName"
-          children={(field) => (
+        </form.Field>
+        <form.Field name="lastName">
+          {(field) => (
             <fieldset className="w-full">
               <label
                 className="block mb-0.5 ml-0.5"
@@ -132,11 +130,10 @@ export function ContactForm({
               <FieldInfo field={field} />
             </fieldset>
           )}
-        />
+        </form.Field>
       </div>
-      <form.Field
-        name="email"
-        children={(field) => (
+      <form.Field name="email">
+        {(field) => (
           <fieldset className="w-full">
             <label
               className="block mb-0.5 ml-0.5"
@@ -160,10 +157,9 @@ export function ContactForm({
             <FieldInfo field={field} />
           </fieldset>
         )}
-      />
-      <form.Field
-        name="comment"
-        children={(field) => (
+      </form.Field>
+      <form.Field name="comment">
+        {(field) => (
           <fieldset className="w-full">
             <label
               className="block mb-0.5 ml-0.5"
@@ -182,10 +178,9 @@ export function ContactForm({
             <FieldInfo field={field} />
           </fieldset>
         )}
-      />
-      <form.Field
-        name="communicationsConsent"
-        children={(field) => (
+      </form.Field>
+      <form.Field name="communicationsConsent">
+        {(field) => (
           <fieldset className="w-full">
             <div className="flex items-start gap-2">
               <input
@@ -204,7 +199,7 @@ export function ContactForm({
             <FieldInfo field={field} />
           </fieldset>
         )}
-      />
+      </form.Field>
       {turnstileSiteKey ? (
         <Turnstile
           ref={turnstile_ref}

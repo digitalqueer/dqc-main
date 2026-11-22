@@ -1,4 +1,4 @@
-import { LinkComponentProps } from "@tanstack/react-router";
+import type { LinkComponentProps } from "@tanstack/react-router";
 import Link from "./Link";
 
 interface DefinitionProps {

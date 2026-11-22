@@ -46,7 +46,8 @@ export function FormActions({
       </Button>
       <form.Subscribe
         selector={(state) => [state.canSubmit, state.isSubmitting] as const}
-        children={([can_submit, is_submitting]) => (
+      >
+        {([can_submit, is_submitting]) => (
           <Button
             type="submit"
             loading={is_submitting}
@@ -56,7 +57,7 @@ export function FormActions({
             {submit_icon}
           </Button>
         )}
-      />
+      </form.Subscribe>
     </div>
   );
 }

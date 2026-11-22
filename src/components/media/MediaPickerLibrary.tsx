@@ -55,6 +55,7 @@ export function MediaPickerLibrary({
     set_search({ page: 1 });
   }, [reload]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `attempt` isn't read; bumping it is how "Try again" reloads the same page.
   useEffect(() => {
     let is_current = true;
     set_is_loading(true);
@@ -90,6 +91,7 @@ export function MediaPickerLibrary({
       <ul aria-hidden className="grid grid-cols-3 gap-2 px-2 sm:grid-cols-4">
         {Array.from({ length: 8 }, (_, index) => (
           <li
+            // biome-ignore lint/suspicious/noArrayIndexKey: a fixed set of placeholders, never reordered
             key={index}
             className="aspect-square animate-pulse bg-neutral-800"
           />
@@ -104,7 +106,7 @@ export function MediaPickerLibrary({
   return (
     <div className="flex flex-col gap-4 px-2" aria-busy={is_loading}>
       {tags.length > 0 && (
-        <div role="group" aria-label="Filter by tag" className="flex flex-wrap gap-2 text-sm">
+        <fieldset aria-label="Filter by tag" className="flex min-w-0 flex-wrap gap-2 text-sm">
           <button
             type="button"
             aria-pressed={!search.tag}
@@ -124,7 +126,7 @@ export function MediaPickerLibrary({
               #{entry.tag}
             </button>
           ))}
-        </div>
+        </fieldset>
       )}
       {items.length > 0 ? (
         <ul

@@ -40,6 +40,7 @@ const MediaContext = createContext(NO_MEDIA);
 function children_of(node: SerializedRichTextNode, depth: number) {
   if (!Array.isArray(node.children) || depth >= MAX_DEPTH) return null;
   return node.children.map((child, index) => (
+    // biome-ignore lint/suspicious/noArrayIndexKey: stored nodes have no ids, and a rendered document never reorders
     <RichTextNode key={index} node={child} depth={depth + 1} />
   ));
 }

@@ -102,10 +102,9 @@ function PostForm({
     if (!item) return;
     const confirmed = await confirm({
       title: `Delete "${item.title}"?`,
-      description:
-        (item.isPublished
-          ? "It's published, so it will disappear from the site. "
-          : "") + "This can't be undone.",
+      description: item.isPublished
+        ? "It's published, so it will disappear from the site. This can't be undone."
+        : "This can't be undone.",
       confirm_label: "Delete post",
       is_destructive: true,
     });
@@ -138,23 +137,22 @@ function PostForm({
                 syncing_slug.current = false;
               },
             }}
-            children={(field) => (
+          >
+            {(field) => (
               <field.TextField
                 className="sm:col-span-2"
                 label="Title"
                 placeholder="DQC(3) in 2026"
               />
             )}
-          />
-          <form.AppField
-            name="kind"
-            children={(field) => (
+          </form.AppField>
+          <form.AppField name="kind">
+            {(field) => (
               <field.SelectField label="Kind" options={KIND_OPTIONS} />
             )}
-          />
-          <form.Subscribe
-            selector={(state) => state.values.kind}
-            children={(kind) => (
+          </form.AppField>
+          <form.Subscribe selector={(state) => state.values.kind}>
+            {(kind) => (
               <form.AppField
                 name="slug"
                 listeners={{
@@ -165,18 +163,18 @@ function PostForm({
                     }
                   },
                 }}
-                children={(field) => (
+              >
+                {(field) => (
                   <field.TextField
                     label={`Slug (${POST_KIND_PATHS[kind]}/…)`}
                     placeholder="2026"
                   />
                 )}
-              />
+              </form.AppField>
             )}
-          />
-          <form.AppField
-            name="author"
-            children={(field) => (
+          </form.Subscribe>
+          <form.AppField name="author">
+            {(field) => (
               <field.TextField
                 className="sm:col-span-2"
                 label="Author (optional)"
@@ -185,7 +183,7 @@ function PostForm({
                 autoComplete="name"
               />
             )}
-          />
+          </form.AppField>
           {item?.isPublished && (
             <p className="sm:col-span-2 text-sm opacity-80">
               This post is live, so changing its kind or slug changes its URL
@@ -193,9 +191,8 @@ function PostForm({
               live post.
             </p>
           )}
-          <form.AppField
-            name="description"
-            children={(field) => (
+          <form.AppField name="description">
+            {(field) => (
               <field.TextAreaField
                 className="sm:col-span-2"
                 label="Summary (optional)"
@@ -203,7 +200,7 @@ function PostForm({
                 rows={3}
               />
             )}
-          />
+          </form.AppField>
         </div>
         <form.FormActions
           submit_label={is_editing ? "Save Changes" : "Create Draft"}

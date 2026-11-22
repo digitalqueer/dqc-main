@@ -175,7 +175,7 @@ export const cancelMediaUpload = createServerFn({ method: "POST" })
   .validator(mediaIdSchema)
   .handler(async ({ context, data }) => {
     const item = await context.media.getMedia(data.id);
-    if (!item || item.status !== "pending") return { success: true };
+    if (item?.status !== "pending") return { success: true };
     const { storage } = getMediaStorage();
     try {
       // A partial PUT never creates an object, but a finished one might exist.

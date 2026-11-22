@@ -84,26 +84,24 @@ function TeamMemberForm({
         }}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-4 px-2">
-          <form.AppField
-            name="name"
-            children={(field) => (
+          <form.AppField name="name">
+            {(field) => (
               <field.TextField
                 label="Name"
                 placeholder="Jane Doe"
                 autoComplete="off"
               />
             )}
-          />
-          <form.AppField
-            name="pronouns"
-            children={(field) => (
+          </form.AppField>
+          <form.AppField name="pronouns">
+            {(field) => (
               <field.TextField
                 label="Pronouns (optional)"
                 placeholder="she/they"
                 autoComplete="off"
               />
             )}
-          />
+          </form.AppField>
         </div>
         <form.FormActions
           submit_label={is_editing ? "Save Changes" : "Add to Team"}

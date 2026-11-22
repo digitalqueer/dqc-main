@@ -1,16 +1,16 @@
-import { Prettify } from "@/lib/utils";
+import type { Prettify } from "@/lib/utils";
 import { ClientOnly } from "@tanstack/react-router";
-import { Placement } from "@floating-ui/react";
+import type { Placement } from "@floating-ui/react";
 import {
   AlertTriangleIcon,
   CheckIcon,
-  LucideIcon,
+  type LucideIcon,
   OctagonXIcon,
   XIcon,
 } from "lucide-react";
 import {
   createContext,
-  ReactNode,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -53,7 +53,6 @@ function Toast({ onDismiss, toast }: ToastProps) {
 
   return (
     <output
-      role="status"
       className="block pointer-events-none border bg-neutral-950 p-2 w-full"
     >
       <div className="flex items-center gap-2">
@@ -116,6 +115,7 @@ function ToastContainer({ onDismiss, toasts }: ToastContainerProps) {
   // above a modal <dialog> and its backdrop. Putting them inside the open
   // modal keeps them clickable and announced too (see useOpenModalDialog).
   // Showing the popover again moves it above anything opened since.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `modal` isn't read, but a modal opening or closing has to re-show the popover so it stays on top.
   useLayoutEffect(() => {
     const container = ref.current;
     if (!container) return;
@@ -186,7 +186,7 @@ function ToastProvider({ children, placement }: ToastProviderProps) {
       const toast = { id: uuidv7(), type, ...data };
       dispatch({ type: "add-toast", data: toast });
       setTimeout(() => {
-        handleDismissToast(toast.id);
+        dispatch({ type: "dismiss-toast", data: { id: toast.id } });
       }, toast.ttl ?? 10_000);
     },
     [],

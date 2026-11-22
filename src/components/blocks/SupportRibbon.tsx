@@ -1,4 +1,4 @@
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 import Link from "../_ui/Link";
 import BlueskyIcon from "../icons/Bluesky";
 import KoFiIcon from "../icons/KoFi";

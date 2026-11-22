@@ -1,5 +1,5 @@
 import {
-  LinkComponentProps,
+  type LinkComponentProps,
   Link as TanstackLink,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
