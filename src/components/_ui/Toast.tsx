@@ -148,7 +148,7 @@ function ToastProvider({ children, placement }: ToastProviderProps) {
       value={{
         basic: (toast: NewToastArgument) => handleNewToast("basic", toast),
         success: (toast: NewToastArgument) => handleNewToast("success", toast),
-        warning: (toast: NewToastArgument) => handleNewToast("basic", toast),
+        warning: (toast: NewToastArgument) => handleNewToast("warning", toast),
         danger: (toast: NewToastArgument) => handleNewToast("danger", toast),
       }}
     >
