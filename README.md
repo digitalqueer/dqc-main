@@ -1,319 +1,211 @@
-Welcome to your new TanStack app! 
+# dqc-main
 
-# Getting Started
+The Digital Queer Collective's site (dqc.dev): who the collective is, its projects, and its writing ("thoughts"), plus a contact form. Admins sign in with DQC's own sign-in service to reach `/dashboard`.
 
-To run this application:
+The app follows the same structure as [devsharpe](https://github.com/devinsharpe/devsharpe), and code is copied between the two. Its README explains the patterns in more depth.
 
-```bash
-npm install
-npm run start
+- [Stack](#stack)
+- [Getting started](#getting-started)
+- [Scripts](#scripts)
+- [Environment](#environment)
+- [Project layout](#project-layout)
+- [How a request flows](#how-a-request-flows)
+- [Authentication](#authentication)
+- [Migrations](#migrations)
+- [Deploying](#deploying)
+
+## Stack
+
+| Concern    | Choice                                                                                                                                                   |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework  | [TanStack Start](https://tanstack.com/start) (React 19, TanStack Router file routes, server functions), built with Vite and Nitro (`node-server` preset) |
+| Database   | Postgres, with [Drizzle ORM](https://orm.drizzle.team) (1.0 RC) and drizzle-kit migrations                                                               |
+| Validation | Zod 4, shared by forms and server functions                                                                                                              |
+| Forms      | TanStack Form (`@tanstack/react-form-start`)                                                                                                             |
+| Auth       | [Better Auth](https://better-auth.com) with a generic OAuth provider (DQC's sign-in service)                                                             |
+| Styling    | Tailwind CSS v4 and `@tailwindcss/typography`                                                                                                            |
+| Bot check  | Cloudflare Turnstile on the contact form                                                                                                                 |
+| Mail       | Resend, for people who opt in to communications on the contact form                                                                                     |
+| Analytics  | Plausible (self-hosted), loaded from the root route                                                                                                      |
+
+## Getting started
+
+The local stack runs in Docker Compose: the app and Postgres.
+
+```sh
+cp .env.example .env    # then fill in BETTER_AUTH_SECRET and the DQC_* values
+docker compose up
 ```
 
-# Building For Production
+Open <http://localhost:3000>. Each time the app container starts, [`docker/dev-entrypoint.sh`](docker/dev-entrypoint.sh):
 
-To build this application for production:
+1. Runs `npm ci` if `package-lock.json` changed since the last install. `node_modules` is a Docker volume, so the Linux builds stay separate from the host's.
+2. Applies pending migrations (`npm run migrate`).
+3. Starts the Vite dev server. The source is bind-mounted, so edits hot-reload.
 
-```bash
-npm run build
+Compose sets `DATABASE_URL` itself; everything else comes from `.env`. Sign in at `/login` to reach `/dashboard`.
+
+| Service  | URL                                                          | Move it with    |
+| -------- | ------------------------------------------------------------ | --------------- |
+| App      | <http://localhost:3000>                                      | (fixed)         |
+| Postgres | `localhost:5432` (user, password and database are all `dqc`) | `POSTGRES_PORT` |
+
+`docker compose down -v` deletes the database and the installed `node_modules`.
+
+To run the dev server on the host instead, start only the database with `docker compose up postgres`, then run `npm install`, `npm run migrate` and `npm run dev`. `.env.example`'s `DATABASE_URL` already points at it.
+
+## Scripts
+
+| Script                  | What it does                                                                                                                      |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`           | Vite dev server on port 3000                                                                                                      |
+| `npm run build`         | Production build to `.output/`: the server, plus a self-contained build of the start-up scripts in `.output/tools`                |
+| `npm start`             | Runs the production build (`node .output/server/index.mjs`). The Docker image runs migrations first; see [Deploying](#deploying). |
+| `npm run typecheck`     | `tsc --noEmit`. There are no tests yet, so this is the check to run.                                                              |
+| `npm run gen-migration` | Generates a migration in `drizzle/` from changes to the schema                                                                    |
+| `npm run migrate`       | Applies pending migrations to `DATABASE_URL`                                                                                      |
+| `npm run check`         | Biome: formatting and lint                                                                                                        |
+
+Inside Docker, prefix any of these with `docker compose exec app`.
+
+## Environment
+
+See [`.env.example`](.env.example) for every variable, with comments. Server code reads them through `getServerEnv()` in [`src/server/env.server.ts`](src/server/env.server.ts), on each call and never at module scope. Nothing is built into the client bundle, so the image builds without any of them.
+
+| Variables                                                                                                              | Used for                         | Without them                     |
+| ---------------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------- |
+| `DATABASE_URL`                                                                                                         | Postgres                         | Nothing works                    |
+| `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`                                                                                | Sessions and the OAuth callback  | Sign-in fails                    |
+| `DQC_CLIENT_ID`, `DQC_CLIENT_SECRET`, `DQC_AUTHORIZE_URL`, `DQC_TOKEN_URL`, `DQC_USER_INFO_URL`, `DQC_END_SESSION_URL` | The OAuth provider               | Sign-in fails                    |
+| `VITE_CLOUDFLARE_SITEKEY`, `CLOUDFLARE_SECRET_KEY`                                                                     | Turnstile on the contact form    | The contact form is switched off |
+| `RESEND_SECRET_KEY`                                                                                                    | The contact form's mail opt-in   | Opting in fails                  |
+
+## Project layout
+
+```text
+.
+├── .gitea/workflows/         Builds the production image, pushes it to the registry, tells Dokploy
+├── Dockerfile                Production image (see Deploying)
+├── compose.yaml              Local stack: app, postgres
+├── docker/                   Dev entrypoint, production start script, its build config and package.json
+├── drizzle/                  Generated SQL migrations (one folder each)
+├── drizzle.config.ts         drizzle-kit: schema path, output folder
+├── vite.config.ts            TanStack Start + Nitro + Tailwind + React
+└── src/
+    ├── start.ts              Request middleware: logging, CSRF
+    ├── router.tsx            Router defaults
+    ├── routeTree.gen.ts      Generated by the router plugin; don't edit
+    ├── routes/               File-based routes: pages and server routes
+    │   ├── __root.tsx        Document shell, header/footer, <head>
+    │   ├── _authenticated.tsx  Sign-in guard for the admin pages
+    │   ├── _authenticated/   Admin: /dashboard/*
+    │   └── api/              Server routes: auth, health
+    ├── components/
+    ├── lib/                  Client-safe: constants, Zod schemas, pure helpers
+    ├── server/               Server-only code
+    │   ├── functions/        Server functions (*.functions.ts): the app's API
+    │   ├── middleware/       Function middleware (*.middleware.ts)
+    │   ├── database/         Drizzle client, schema, relations, migrator
+    │   ├── auth.server.ts    Better Auth instance
+    │   └── env.server.ts     Environment access
+    └── styles/
 ```
 
-## Testing
+`src/server/contact/`, `src/server/thoughts/` and `src/server/turnstile/` predate this layout. They're moving into `functions/`, `middleware/` and `repositories/`, with their schemas in `src/lib`, as each feature gets its admin pages.
 
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
+## How a request flows
 
-```bash
-npm run test
+```mermaid
+flowchart LR
+  B["Browser"] --> RM["Request middleware: logger, CSRF"]
+  RM --> P["Page: route loader + component"]
+  RM --> SR["Server route: /api/*"]
+  P -->|"calls"| SF["Server function"]
+  SF --> FM["Function middleware: auth, then repositories"]
+  FM --> H["Handler: validated data + context"]
+  H --> R["Repository"]
+  R --> DB[("Postgres")]
 ```
 
-## Styling
+- **Request middleware** ([`src/start.ts`](src/start.ts)) wraps everything the server handles. `requestLogger` logs `[id] METHOD /path 12ms` and sets an `x-request-id` header. `createCsrfMiddleware` guards server function calls.
+- **Server functions** are the app's only API for pages. Each one declares its middleware (auth first for admin functions, then the repositories it needs in `context`) and a Zod validator, then calls into a repository.
+- **Server routes** handle raw HTTP that isn't page data: the Better Auth handler and `/api/health`.
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+## Authentication
 
+[`src/server/auth.server.ts`](src/server/auth.server.ts) configures Better Auth with the Drizzle adapter and one generic OAuth provider, `dqc`, whose endpoints come from the `DQC_*` variables. `/login` calls `auth_client.signIn.social({ provider: "dqc" })`, and `/api/auth/$` handles the callback.
 
-## Linting & Formatting
+- **Pages.** [`_authenticated.tsx`](src/routes/_authenticated.tsx) checks the session in `beforeLoad` and redirects to `/login?redirect=…` without one. After signing in, `/login` sends you back there (only to paths on this site), or to `/dashboard`. Everything under `src/routes/_authenticated/` is behind it.
+- **Data.** Each admin server function uses `ensure_auth_middleware` from [`auth.middleware.ts`](src/server/middleware/auth.middleware.ts). The route guard only hides pages, so the middleware is what actually protects the data.
+- **Who's an admin.** Any signed-in session counts. Who can sign in is decided by the dqc-main application's settings in DQC's sign-in service, not by this app.
+- **Signing out** (the footer's button) ends the session here and at the provider (`DQC_END_SESSION_URL`), then comes back to `/`. The footer's 🏳️‍🌈 is the way in to `/login`.
 
-This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
+## Migrations
 
+1. Change [`schema.server.ts`](src/server/database/schema.server.ts).
+2. Run `npm run gen-migration`, which writes `drizzle/<timestamp>_<name>/migration.sql` and a snapshot.
+3. Read the generated SQL, especially for renames, which drizzle-kit may treat as a drop and an add.
+4. Apply it with `docker compose exec app npm run migrate`, or restart the app container.
 
-```bash
-npm run lint
-npm run format
-npm run check
+drizzle-kit and the production image's migrator (drizzle-orm's own, see [Deploying](#deploying)) record what they've applied in the same table, `drizzle.__drizzle_migrations`, so either can follow the other. The first migration, `20260324232124_odd_titania`, was converted from drizzle-kit 0.31's format with `drizzle-kit up`. Databases that 0.31 migrated recognise it as already applied.
+
+## Deploying
+
+Production runs the image built from the [`Dockerfile`](Dockerfile). A Gitea Actions runner builds it and pushes it to the Gitea container registry, and Dokploy pulls it from there, so builds don't take resources from the server the site runs on.
+
+**The image.** The build stage runs `npm ci` and `npm run build` on `node:26-trixie-slim`. The runtime image takes only three things from it:
+
+- the built server (`.output/server`), with its dependencies bundled in
+- the start-up scripts (`.output/tools`), bundled the same way by [`docker/vite.tools.config.mjs`](docker/vite.tools.config.mjs)
+- the migrations' SQL (`drizzle/`)
+
+The runtime base is `node:26-trixie-slim` too, so the container has `bash` and `npm` for debugging, for example in Dokploy's terminal. It has no `node_modules`, so its `package.json` is [`docker/runtime.package.json`](docker/runtime.package.json), whose `npm run migrate` runs the bundled migrator. It runs as the base image's non-root `node` user, and the app's files stay owned by root.
+
+**Each time the container starts**, [`docker/start.mjs`](docker/start.mjs) applies pending migrations with [`migrate.server.ts`](src/server/database/migrate.server.ts), then starts the server on port 3000, all in the one Node process. If the migrations fail, for example because the database is unreachable, the container exits with an error instead of serving on an old schema.
+
+**Health check.** The image's `HEALTHCHECK` requests `GET /api/health` every 30 seconds, after a 60-second start period that covers the migrations. It runs the request with Node, since the image has no `curl`.
+
+### Building on a runner
+
+[`.gitea/workflows/build-image.yml`](.gitea/workflows/build-image.yml) runs on each push to `main`, and by hand from the repository's Actions tab. It builds the image for `linux/amd64` and `linux/arm64`, then pushes it as `gitea.dqc.dev/<owner>/<repository>`, tagged with the short commit hash and `latest`. If `DOKPLOY_WEBHOOK_URL` is set, it then tells Dokploy to deploy.
+
+It needs these repository secrets (Settings → Actions → Secrets):
+
+| Secret                | Value                                                                   |
+| --------------------- | ----------------------------------------------------------------------- |
+| `REGISTRY_USERNAME`   | A Gitea user that can write the repository's packages                   |
+| `REGISTRY_PASSWORD`   | An access token for that user, with package read and write              |
+| `DOKPLOY_WEBHOOK_URL` | Optional: the application's deploy webhook URL from Dokploy (see below) |
+
+**Cloudflare's upload limit.** The registry is behind Cloudflare, which rejects any request over 100 MB. A push uploads each layer in its own request, so each layer must fit. The largest here is the base image's Node and npm. Copying `node_modules` into the runtime image, or exporting the build cache with `--cache-to type=registry,mode=max`, would break that.
+
+### Setting it up in Dokploy
+
+1. Add the Gitea registry under Dokploy's registry settings: URL `https://gitea.dqc.dev`, and a user and token that can read the package. Or give the credentials in the application's Docker settings.
+2. Set the application's source to **Docker**, with the image `gitea.dqc.dev/<owner>/<repository>:latest`. Include the registry host: without it, Docker looks for the image on Docker Hub.
+3. Turn on Auto Deploy, then copy the application's webhook URL into the repository secret `DOKPLOY_WEBHOOK_URL`. Check the first deploy's log to confirm that Dokploy pulls `latest` again.
+4. Add the environment variables below.
+5. Point the site's domain at container port **3000**, with HTTPS.
+
+Building from the repository in Dokploy (the **Dockerfile** build type) also works, but use one or the other, or each push deploys twice.
+
+### Production environment
+
+| Variables                                          | Value                                                                                                                         |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`, `PORT`                                 | Set by the image (`production`, `3000`)                                                                                       |
+| `DATABASE_URL`                                     | The production database                                                                                                       |
+| `BETTER_AUTH_URL`                                  | The public origin, e.g. `https://dqc.dev`. Session cookies are marked secure, and the OAuth redirect URI is built, from it.  |
+| `BETTER_AUTH_SECRET`                               | A long random value, e.g. `openssl rand -base64 32`                                                                           |
+| `DQC_*`                                            | The dqc-main sign-in application's client and endpoints. Add `https://<domain>/api/auth/callback/dqc` to its redirect URIs. |
+| `VITE_CLOUDFLARE_SITEKEY`, `CLOUDFLARE_SECRET_KEY` | A real Turnstile widget's keys, with the domain in its hostnames. Both are read when the server runs, not at build time.       |
+| `RESEND_SECRET_KEY`                                | Resend's API key                                                                                                              |
+
+### Trying the image locally
+
+```sh
+docker build -t dqc-main .
+docker run --rm -p 3000:3000 --env-file .env.production dqc-main
 ```
 
-
-## T3Env
-
-- You can use T3Env to add type safety to your environment variables.
-- Add Environment variables to the `src/env.mjs` file.
-- Use the environment variables in your code.
-
-### Usage
-
-```ts
-import { clientEnv } from "@/env";
-
-console.log(env.VITE_APP_TITLE);
-```
-
-
-
-
-
-
-## Routing
-This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add another a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you use the `<Outlet />` component.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-
-import { Link } from "@tanstack/react-router";
-
-export const Route = createRootRoute({
-  component: () => (
-    <>
-      <header>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-        </nav>
-      </header>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-})
-```
-
-The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-const peopleRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/people",
-  loader: async () => {
-    const response = await fetch("https://swapi.dev/api/people");
-    return response.json() as Promise<{
-      results: {
-        name: string;
-      }[];
-    }>;
-  },
-  component: () => {
-    const data = peopleRoute.useLoaderData();
-    return (
-      <ul>
-        {data.results.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    );
-  },
-});
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-### React-Query
-
-React-Query is an excellent addition or alternative to route loading and integrating it into you application is a breeze.
-
-First add your dependencies:
-
-```bash
-npm install @tanstack/react-query @tanstack/react-query-devtools
-```
-
-Next we'll need to create a query client and provider. We recommend putting those in `main.tsx`.
-
-```tsx
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// ...
-
-const queryClient = new QueryClient();
-
-// ...
-
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  );
-}
-```
-
-You can also add TanStack Query Devtools to the root route (optional).
-
-```tsx
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="top-right" />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
-
-Now you can use `useQuery` to fetch your data.
-
-```tsx
-import { useQuery } from "@tanstack/react-query";
-
-import "./App.css";
-
-function App() {
-  const { data } = useQuery({
-    queryKey: ["people"],
-    queryFn: () =>
-      fetch("https://swapi.dev/api/people")
-        .then((res) => res.json())
-        .then((data) => data.results as { name: string }[]),
-    initialData: [],
-  });
-
-  return (
-    <div>
-      <ul>
-        {data.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export default App;
-```
-
-You can find out everything you need to know on how to use React-Query in the [React-Query documentation](https://tanstack.com/query/latest/docs/framework/react/overview).
-
-## State Management
-
-Another common requirement for React applications is state management. There are many options for state management in React. TanStack Store provides a great starting point for your project.
-
-First you need to add TanStack Store as a dependency:
-
-```bash
-npm install @tanstack/store
-```
-
-Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-function App() {
-  const count = useStore(countStore);
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-    </div>
-  );
-}
-
-export default App;
-```
-
-One of the many nice features of TanStack Store is the ability to derive state from other state. That derived state will update when the base state updates.
-
-Let's check this out by doubling the count using derived state.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store, Derived } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-const doubledStore = new Derived({
-  fn: () => countStore.state * 2,
-  deps: [countStore],
-});
-doubledStore.mount();
-
-function App() {
-  const count = useStore(countStore);
-  const doubledCount = useStore(doubledStore);
-
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-      <div>Doubled - {doubledCount}</div>
-    </div>
-  );
-}
-
-export default App;
-```
-
-We use the `Derived` class to create a new store that is derived from another store. The `Derived` class has a `mount` method that will start the derived store updating.
-
-Once we've created the derived store we can use it in the `App` component just like we would any other store using the `useStore` hook.
-
-You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+`.env.*` files are ignored by git and Docker, so the file's secrets stay out of commits and images. Its addresses must be reachable from inside the container, where `localhost` is the container itself. Use the other containers' names on a shared Docker network, or `host.docker.internal` to reach the host.
