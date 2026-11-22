@@ -4,14 +4,13 @@ import { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 import { ClientOnly } from "@tanstack/react-router";
 import Turnstile from "react-turnstile";
-import { clientEnv } from "@/env";
 import {
   CONTACT_TURNSTILE_ACTION,
   NewContactRequestSchema,
 } from "@/schemas/contactRequest.schema";
 import { createContactRequestServerFn } from "@/server/contact/contact.functions";
 import { useToast } from "../_ui/Toast";
-import {
+import type {
   InvalidContactRequestReponse,
   ValidContactRequestResponse,
 } from "@/server/contact/contact.server";
@@ -19,12 +18,15 @@ import {
 interface ContactFormProps
   extends Omit<ComponentProps<"form">, "id" | "onSubmit"> {
   id: string;
+  /** From getContactFormServerFn; null while Turnstile isn't configured. */
+  turnstileSiteKey: string | null;
   onValidResponse?: (response: ValidContactRequestResponse) => void;
   onInvalidResponse?: (response: InvalidContactRequestReponse) => void;
 }
 
 export function ContactForm({
   id,
+  turnstileSiteKey,
   onValidResponse,
   onInvalidResponse,
   ...props
@@ -188,22 +190,28 @@ export function ContactForm({
           </fieldset>
         )}
       />
-      <ClientOnly>
-        <form.Field
-          name="turnstileToken"
-          children={(field) => (
-            <Turnstile
-              className="mt-2"
-              action={CONTACT_TURNSTILE_ACTION}
-              fixedSize
-              refreshExpired="auto"
-              size="normal"
-              sitekey={clientEnv.VITE_CLOUDFLARE_SITEKEY}
-              onVerify={(token) => field.handleChange(token)}
-            />
-          )}
-        />
-      </ClientOnly>
+      {turnstileSiteKey ? (
+        <ClientOnly>
+          <form.Field
+            name="turnstileToken"
+            children={(field) => (
+              <Turnstile
+                className="mt-2"
+                action={CONTACT_TURNSTILE_ACTION}
+                fixedSize
+                refreshExpired="auto"
+                size="normal"
+                sitekey={turnstileSiteKey}
+                onVerify={(token) => field.handleChange(token)}
+              />
+            )}
+          />
+        </ClientOnly>
+      ) : (
+        <p className="mt-2 text-neutral-400 text-sm">
+          The contact form isn't available right now. Please try again later.
+        </p>
+      )}
     </form>
   );
 }
