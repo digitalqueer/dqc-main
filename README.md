@@ -98,9 +98,9 @@ See [`.env.example`](.env.example) for every variable, with comments. Server cod
     ├── routes/               File-based routes: pages and server routes
     │   ├── __root.tsx        Document shell, header/footer, <head>
     │   ├── _authenticated.tsx  Sign-in guard for the admin pages
-    │   ├── _authenticated/   Admin: /dashboard/*
+    │   ├── _authenticated/   Admin: /dashboard, /dashboard/requests
     │   └── api/              Server routes: auth, health
-    ├── components/
+    ├── components/           _ui/ holds the primitives (Button, Dialog, AlertDialog, Toast, …)
     ├── lib/                  Client-safe: constants, Zod schemas, pure helpers
     ├── server/               Server-only code
     │   ├── functions/        Server functions (*.functions.ts): the app's API
@@ -153,12 +153,28 @@ The contact form is the first feature built on this pattern, so it's a good one 
 
 Sending a message:
 
-1. The [`Turnstile`](src/components/Turnstile.tsx) widget loads Cloudflare's script when the form first renders, then hands the form a token.
+1. The [`Turnstile`](src/components/Turnstile.tsx) widget loads Cloudflare's script when the form renders, then hands the form a token. The form lives on the home page, inside a closed dialog, so only the home page loads the script.
 2. `submitContactRequest` checks the token with [`turnstile.server.ts`](src/server/turnstile.server.ts). It answers 400 if Cloudflare rejects the token, and 503 if Cloudflare can't be reached. The form resets the widget after every attempt, since each token works only once.
 3. If the person opted in, [`resend.server.ts`](src/server/resend.server.ts) adds them to Resend's contacts.
 4. The message is saved. It's saved even when the Resend step fails: the failure is logged, and the request is stored with consent but no `communications_id`.
 
-Each request has a `read_at` column: null while it's new, and the time it was first read once an admin opens it.
+Each request has a `read_at` column: null while it's new, and set when an admin first marks it read. Marking it new again clears it.
+
+## Admin pages
+
+Everything under `src/routes/_authenticated/` needs a session (see [Authentication](#authentication)). Today that's:
+
+- **`/dashboard`:** the three newest contact requests, and placeholders for thoughts, projects and the team, which move into Postgres next.
+- **`/dashboard/requests`:** the inbox. New requests come first, then read ones 20 to a page. Each can be answered by email, marked read or new, or deleted.
+
+The admin layout wraps its pages in an `AlertDialogProvider`, so any of them can ask before doing something that can't be undone:
+
+```tsx
+const confirm = useConfirm();
+if (!(await confirm({ title: "Delete it?", confirm_label: "Delete", is_destructive: true }))) return;
+```
+
+New admin pages start with a [`BreadcrumbNav`](src/components/_ui/BreadcrumbNav.tsx). After a change, they call `router.invalidate()` to reload their loader data, and report the result with a toast, as [`ContactRequestItem`](src/components/ContactRequestItem.tsx) does. A loader that throws shows [`ErrorView`](src/components/_ui/ErrorView.tsx) with the error's message, so write those messages for the person reading them.
 
 ## Migrations
 

@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { AlertDialogProvider } from "@/components/_ui/AlertDialog";
 import { getSession } from "@/server/functions/auth.functions";
 
 // Hides the admin pages from anyone signed out. The data is protected by
@@ -16,5 +17,14 @@ export const Route = createFileRoute("/_authenticated")({
 
     return { user: session.user };
   },
-  component: () => <Outlet />,
+  head: () => ({
+    // Signed-in pages; nothing here belongs in search results.
+    meta: [{ name: "robots", content: "noindex" }],
+  }),
+  // Lets admin pages ask before deleting or leaving (see useConfirm).
+  component: () => (
+    <AlertDialogProvider>
+      <Outlet />
+    </AlertDialogProvider>
+  ),
 });
