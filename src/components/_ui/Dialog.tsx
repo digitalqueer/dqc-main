@@ -15,6 +15,16 @@ import { ClientOnly } from "@tanstack/react-router";
 import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// The Invoker Commands API (`<button command="show-modal" commandfor="id">`)
+// opens and closes the <dialog> without JavaScript. React passes the
+// attributes through to the DOM, but its types don't list them yet.
+declare module "react" {
+  interface ButtonHTMLAttributes<T> {
+    command?: string;
+    commandfor?: string;
+  }
+}
+
 interface DialogContextValue {
   id: string;
   open: boolean;
@@ -89,7 +99,7 @@ function Action({ children, command, ...props }: DialogActionProps) {
 interface ContentProps
   extends Omit<ComponentProps<"dialog">, "open" | "onClose"> {}
 
-function Content({ children, className, idSetter, ...props }: ContentProps) {
+function Content({ children, className, ...props }: ContentProps) {
   const context = useDialogContext();
 
   return (

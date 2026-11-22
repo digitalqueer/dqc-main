@@ -3,7 +3,6 @@ import Link from "../_ui/Link";
 import BlueskyIcon from "../icons/Bluesky";
 import KoFiIcon from "../icons/KoFi";
 import { cn } from "@/lib/utils";
-import { Building2Icon } from "lucide-react";
 
 export default function SupportRibbon(props: ComponentProps<"div">) {
   return (
