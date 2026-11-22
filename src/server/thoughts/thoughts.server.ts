@@ -1,21 +1,25 @@
-import path from "path";
-import fs from "fs/promises";
 import { ThoughtPostDataSchema } from "../../schemas/thoughtPost.schema";
 import z from "zod";
 import matter from "gray-matter";
 
-const THOUGHTS_POST_DIR = "src/posts/thoughts";
+const THOUGHTS_POST_DIR = "/src/posts/thoughts";
+
+// The posts' Markdown, built into the server bundle at build time and keyed by
+// path, so they don't depend on the source being next to the running server
+// (the production image only has the build). Thoughts move into the database
+// once the admin can edit them.
+const THOUGHT_POST_FILES = import.meta.glob<string>("/src/posts/thoughts/*.md", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
 
 export async function getThoughtPost(slug: string) {
-  const thoughtPostPath = path.resolve(THOUGHTS_POST_DIR, `${slug}.md`);
-  const doesThoughtPostFileExist = await fs
-    .access(thoughtPostPath, fs.constants.F_OK)
-    .then(() => true)
-    .catch(() => false);
-  if (!doesThoughtPostFileExist) {
+  const thoughtPostFileContent =
+    THOUGHT_POST_FILES[`${THOUGHTS_POST_DIR}/${slug}.md`];
+  if (thoughtPostFileContent === undefined) {
     return null;
   }
-  const thoughtPostFileContent = await fs.readFile(thoughtPostPath, "utf-8");
   const thoughtPostFrontMatter = matter(thoughtPostFileContent);
   const frontMatter = ThoughtPostDataSchema.safeParse(
     thoughtPostFrontMatter.data,
@@ -27,14 +31,7 @@ export async function getThoughtPost(slug: string) {
 }
 
 export async function getThoughtsList() {
-  const thoughtsPostDirectory = path.resolve(THOUGHTS_POST_DIR);
-  const thoughtPostFileEntries = await fs.readdir(thoughtsPostDirectory);
-  const thoughtPostEntryContents = await Promise.all(
-    thoughtPostFileEntries.map((entryPath) =>
-      fs.readFile(path.resolve(thoughtsPostDirectory, entryPath), "utf-8"),
-    ),
-  );
-  const thoughtPostEntries = thoughtPostEntryContents.map((content) =>
+  const thoughtPostEntries = Object.values(THOUGHT_POST_FILES).map((content) =>
     matter(content),
   );
   return thoughtPostEntries.reduce<z.infer<typeof ThoughtPostDataSchema>[]>(
