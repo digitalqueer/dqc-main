@@ -22,7 +22,7 @@ export function FormActions({
   const [is_deleting, set_is_deleting] = useState(false);
 
   return (
-    <div className="-mx-2 px-2 pt-2 border-t flex items-center gap-2">
+    <div className="-mx-2 flex items-center gap-2 border-t px-2 pt-2">
       {on_delete && (
         <Button
           variant="danger"

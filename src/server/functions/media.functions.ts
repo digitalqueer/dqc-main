@@ -144,7 +144,9 @@ export const completeMediaUpload = createServerFn({ method: "POST" })
     if (!stored) {
       await context.media.deleteMedia(item.id);
       setResponseStatus(409);
-      throw new Error("The file never reached storage. Try uploading it again.");
+      throw new Error(
+        "The file never reached storage. Try uploading it again.",
+      );
     }
     const stored_type = stored.contentType.split(";")[0].trim().toLowerCase();
     if (

@@ -3,7 +3,12 @@
 // Stored JSON is treated as untrusted: only known node types and fields are
 // rendered, links must pass `isSafeUrl`, and images come only from the
 // server-resolved `media` map (the document holds just their ids).
-import { type CSSProperties, createContext, type ReactNode, useContext } from "react";
+import {
+  type CSSProperties,
+  createContext,
+  type ReactNode,
+  useContext,
+} from "react";
 import {
   effectiveCaption,
   imageMediaId,
@@ -13,8 +18,8 @@ import {
   type SerializedRichTextNode,
   toRichTextHeadingTag,
 } from "@/lib/rich-text";
-import { RICH_TEXT_CLASSES } from "./richTextClasses";
 import { RichTextFigure } from "./RichTextFigure";
+import { RICH_TEXT_CLASSES } from "./richTextClasses";
 
 // Lexical's text format bit flags.
 const IS_BOLD = 1;
@@ -29,7 +34,14 @@ const IS_HIGHLIGHT = 1 << 7;
 /** Lexical documents nest a few levels deep; anything past this is dropped. */
 const MAX_DEPTH = 32;
 
-const TEXT_ALIGNMENTS = new Set(["left", "center", "right", "justify", "start", "end"]);
+const TEXT_ALIGNMENTS = new Set([
+  "left",
+  "center",
+  "right",
+  "justify",
+  "start",
+  "end",
+]);
 
 /** How many levels to push headings down, e.g. 1 under an h3 (h3 → h4). */
 const HeadingShiftContext = createContext(0);
@@ -135,11 +147,14 @@ function RichTextNode({
     case "listitem": {
       const children = Array.isArray(node.children) ? node.children : [];
       const is_wrapper =
-        children.length > 0 && children.every((child) => child?.type === "list");
+        children.length > 0 &&
+        children.every((child) => child?.type === "list");
       return (
         <li
           value={typeof node.value === "number" ? node.value : undefined}
-          className={is_wrapper ? RICH_TEXT_CLASSES.nested_list_item : undefined}
+          className={
+            is_wrapper ? RICH_TEXT_CLASSES.nested_list_item : undefined
+          }
         >
           {children_of(node, depth)}
         </li>
@@ -149,7 +164,9 @@ function RichTextNode({
       return (
         <pre
           className={RICH_TEXT_CLASSES.code_block}
-          data-language={typeof node.language === "string" ? node.language : undefined}
+          data-language={
+            typeof node.language === "string" ? node.language : undefined
+          }
         >
           <code>{children_of(node, depth)}</code>
         </pre>
@@ -167,7 +184,9 @@ function RichTextNode({
           {...(is_external && { target: "_blank", rel: "noreferrer" })}
         >
           {children_of(node, depth)}
-          {is_external && <span className="sr-only"> (opens in a new tab)</span>}
+          {is_external && (
+            <span className="sr-only"> (opens in a new tab)</span>
+          )}
         </a>
       );
     }

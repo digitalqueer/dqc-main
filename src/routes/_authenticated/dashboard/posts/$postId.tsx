@@ -22,20 +22,22 @@ import {
   unpublishPost,
 } from "@/server/functions/posts.functions";
 
-export const Route = createFileRoute("/_authenticated/dashboard/posts/$postId")({
-  loader: ({ params }) => {
-    if (!isPostId(params.postId)) throw notFound();
-    return getPostEditor({ data: { id: params.postId } });
+export const Route = createFileRoute("/_authenticated/dashboard/posts/$postId")(
+  {
+    loader: ({ params }) => {
+      if (!isPostId(params.postId)) throw notFound();
+      return getPostEditor({ data: { id: params.postId } });
+    },
+    head: ({ loaderData }) => ({
+      meta: [
+        {
+          title: `${loaderData?.post.title ?? "Post"} - Digital Queer Collective`,
+        },
+      ],
+    }),
+    component: RouteComponent,
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: `${loaderData?.post.title ?? "Post"} - Digital Queer Collective`,
-      },
-    ],
-  }),
-  component: RouteComponent,
-});
+);
 
 function RouteComponent() {
   const data = Route.useLoaderData();
@@ -61,12 +63,14 @@ function PostEditor({ post, content, status: loaded_status }: EditorData) {
     <Main>
       <BreadcrumbNav current_page_label={post.title}>
         <BreadcrumbItem to="/dashboard">Dashboard</BreadcrumbItem>
-        <BreadcrumbItem to="/dashboard/posts">Thoughts & Statements</BreadcrumbItem>
+        <BreadcrumbItem to="/dashboard/posts">
+          Thoughts & Statements
+        </BreadcrumbItem>
       </BreadcrumbNav>
       <PublishingEditor
         title={post.title}
         details={
-          <p className="text-sm text-neutral-300 break-all">
+          <p className="text-sm break-all text-neutral-300">
             {POST_KIND_LABELS[post.kind]} · {POST_KIND_PATHS[post.kind]}/
             {post.slug}
             {post.author && ` · By ${post.author}`}
@@ -103,7 +107,7 @@ function PostEditor({ post, content, status: loaded_status }: EditorData) {
         <Dialog.Content className="max-w-2xl gap-2">
           {is_editing_details && (
             <>
-              <div className="-mx-2 px-2 pb-2 border-b">
+              <div className="-mx-2 border-b px-2 pb-2">
                 <h2 className="text-2xl font-bold">Post Details</h2>
               </div>
               <PostForm
@@ -117,7 +121,10 @@ function PostEditor({ post, content, status: loaded_status }: EditorData) {
                 on_deleted={async () => {
                   close_details();
                   // The post is gone, so there's nothing left to save.
-                  await navigate({ to: "/dashboard/posts", ignoreBlocker: true });
+                  await navigate({
+                    to: "/dashboard/posts",
+                    ignoreBlocker: true,
+                  });
                 }}
               />
             </>

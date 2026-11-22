@@ -16,9 +16,9 @@ import {
   useCreateMediaViewStore,
   useRichTextMediaMap,
 } from "./mediaViewStore";
-import { RICH_TEXT_PROSE } from "./richTextClasses";
 import { RichTextEditor } from "./RichTextEditor";
 import { RichTextRenderer } from "./RichTextRenderer";
+import { RICH_TEXT_PROSE } from "./richTextClasses";
 import {
   type RichTextSnapshot,
   useRichTextDocument,
@@ -207,7 +207,7 @@ export function PublishingEditor({
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1 min-w-0">
+        <div className="flex min-w-0 flex-col gap-1">
           <h2 className="text-2xl font-bold">{title}</h2>
           <StatusLine status={status} is_dirty={is_dirty} />
           {details}
@@ -259,7 +259,7 @@ export function PublishingEditor({
         fallback={
           <div
             aria-hidden
-            className="min-h-[27rem] border border-neutral-700 animate-pulse"
+            className="min-h-[27rem] animate-pulse border border-neutral-700"
           />
         }
       >
@@ -290,11 +290,11 @@ export function PublishingEditor({
       </ClientOnly>
       <p className="text-sm opacity-80">
         Markdown shortcuts work as you type: <code>##</code> heading,{" "}
-        <code>###</code> subheading, <code>-</code> or <code>1.</code> list, <code>&gt;</code> quote,{" "}
-        <code>```</code> code block, <code>**bold**</code>,{" "}
-        <code>*italic*</code>, <code>`code`</code>. Press ⌘/Ctrl+K to add a
-        link and ⌘/Ctrl+S to save the draft. The image button adds an image
-        from the media library.
+        <code>###</code> subheading, <code>-</code> or <code>1.</code> list,{" "}
+        <code>&gt;</code> quote, <code>```</code> code block,{" "}
+        <code>**bold**</code>, <code>*italic*</code>, <code>`code`</code>. Press
+        ⌘/Ctrl+K to add a link and ⌘/Ctrl+S to save the draft. The image button
+        adds an image from the media library.
       </p>
     </>
   );

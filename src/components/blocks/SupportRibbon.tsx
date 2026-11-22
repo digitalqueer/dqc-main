@@ -1,8 +1,8 @@
 import type { ComponentProps } from "react";
+import { cn } from "@/lib/utils";
 import Link from "../_ui/Link";
 import BlueskyIcon from "../icons/Bluesky";
 import KoFiIcon from "../icons/KoFi";
-import { cn } from "@/lib/utils";
 
 export default function SupportRibbon(props: ComponentProps<"div">) {
   return (

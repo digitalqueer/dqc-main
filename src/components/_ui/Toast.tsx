@@ -1,6 +1,5 @@
-import type { Prettify } from "@/lib/utils";
-import { ClientOnly } from "@tanstack/react-router";
 import type { Placement } from "@floating-ui/react";
+import { ClientOnly } from "@tanstack/react-router";
 import {
   AlertTriangleIcon,
   CheckIcon,
@@ -22,6 +21,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { v7 as uuidv7 } from "uuid";
+import type { Prettify } from "@/lib/utils";
 import Button from "./Button";
 
 type ToastType = "basic" | "success" | "warning" | "danger";
@@ -52,9 +52,7 @@ function Toast({ onDismiss, toast }: ToastProps) {
   }, [toast.type]);
 
   return (
-    <output
-      className="block pointer-events-none border bg-neutral-950 p-2 w-full"
-    >
+    <output className="pointer-events-none block w-full border bg-neutral-950 p-2">
       <div className="flex items-center gap-2">
         {Icon && <Icon className="size-4 shrink-0" />}
         <span className="grow">{toast.title}</span>
@@ -67,7 +65,7 @@ function Toast({ onDismiss, toast }: ToastProps) {
         </Button>
       </div>
       {toast.description && (
-        <p className="text-sm text-neutral-300 mt-2">{toast.description}</p>
+        <p className="mt-2 text-sm text-neutral-300">{toast.description}</p>
       )}
     </output>
   );
@@ -129,7 +127,7 @@ function ToastContainer({ onDismiss, toasts }: ToastContainerProps) {
       popover="manual"
       aria-label="Notifications"
       // Undoes the popover's default look (centered, bordered, Canvas colors).
-      className="hidden open:flex fixed inset-x-0 top-0 bottom-auto mx-auto h-fit w-full max-w-sm flex-col gap-2 overflow-visible bg-transparent p-2 text-neutral-100 pointer-events-none"
+      className="pointer-events-none fixed inset-x-0 top-0 bottom-auto mx-auto hidden h-fit w-full max-w-sm flex-col gap-2 overflow-visible bg-transparent p-2 text-neutral-100 open:flex"
     >
       {toasts.map((toast) => (
         <Toast

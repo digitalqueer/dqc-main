@@ -116,19 +116,24 @@ export function ContactRequestItem({
   return (
     <li
       {...props}
-      className={cn("border border-neutral-700 flex flex-col gap-2 p-2", className)}
+      className={cn(
+        "flex flex-col gap-2 border border-neutral-700 p-2",
+        className,
+      )}
     >
       <div className="flex items-start gap-4">
-        <div className="flex flex-col flex-1 min-w-0">
-          <p className="text-neutral-300 text-sm">
-            {is_new && <span className="font-semibold text-neutral-100">New · </span>}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <p className="text-sm text-neutral-300">
+            {is_new && (
+              <span className="font-semibold text-neutral-100">New · </span>
+            )}
             Received <LocalTime date={item.createdAt} />
           </p>
           <p id={title_id} className="font-medium break-words">
             {name}
           </p>
           <p className="text-sm">
-            <a href={replyHref(item.email)} className="underline break-all">
+            <a href={replyHref(item.email)} className="break-all underline">
               {item.email}
             </a>
           </p>
@@ -172,7 +177,7 @@ export function ContactRequestItem({
       {/* Plain text, exactly as sent (React escapes it). */}
       <p
         className={cn(
-          "whitespace-pre-wrap break-words",
+          "break-words whitespace-pre-wrap",
           is_compact && "line-clamp-4",
         )}
       >
@@ -190,7 +195,7 @@ export function ContactRequestItem({
               strokeWidth={1.5}
               size={16}
               aria-hidden
-              className="shrink-0 mt-0.5"
+              className="mt-0.5 shrink-0"
             />
             Signed up for DQC's newsletters, but couldn't be added to Resend.
             Add them by hand; the server log says why it failed.

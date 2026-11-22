@@ -1,3 +1,5 @@
+import { createFileRoute, Link as TanstackLink } from "@tanstack/react-router";
+import { ArrowRightIcon, SendIcon } from "lucide-react";
 import Definition from "@/components/_ui/Definition";
 import Dialog from "@/components/_ui/Dialog";
 import Link from "@/components/_ui/Link";
@@ -7,8 +9,6 @@ import SupportRibbon from "@/components/blocks/SupportRibbon";
 import ContactDialog from "@/components/dialogs/ContactDialog";
 import { getContactForm } from "@/server/functions/contact.functions";
 import { listActiveProjects } from "@/server/functions/projects.functions";
-import { createFileRoute, Link as TanstackLink } from "@tanstack/react-router";
-import { ArrowRightIcon, SendIcon } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: App,
@@ -28,7 +28,7 @@ function App() {
   return (
     <Main>
       <Prose>
-        <h2 className="normal-case! font-normal!">
+        <h2 className="font-normal! normal-case!">
           The Digital Queer Collective [DQC] is a community of 2SLGBTQIA+
           technologists and policy strategists dedicated to creating innovative
           software that celebrates inclusivity, creativity, and user diversity.
@@ -89,14 +89,14 @@ function App() {
         {projects.map((project) => (
           <div
             key={project.id}
-            className="flex justify-between gap-2 items-center mt-6 mb-2"
+            className="mt-6 mb-2 flex items-center justify-between gap-2"
           >
-            <h4 className="font-bold inline-block m-0!">
+            <h4 className="m-0! inline-block font-bold">
               {project.hasPublishedPage ? (
                 <TanstackLink
                   to="/projects/$slug"
                   params={{ slug: project.id }}
-                  className="no-underline rounded-none"
+                  className="rounded-none no-underline"
                 >
                   {project.name}
                 </TanstackLink>
@@ -111,7 +111,11 @@ function App() {
               className="m-0!"
             >
               <span>View Project</span>
-              <ArrowRightIcon strokeWidth={1.5} className="size-4" aria-hidden />
+              <ArrowRightIcon
+                strokeWidth={1.5}
+                className="size-4"
+                aria-hidden
+              />
             </Link>
           </div>
         ))}

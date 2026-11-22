@@ -32,7 +32,6 @@ import {
   type TextFormatType,
   UNDO_COMMAND,
 } from "lexical";
-import { toRichTextHeadingTag } from "@/lib/rich-text";
 import {
   BoldIcon,
   CodeIcon,
@@ -44,6 +43,7 @@ import {
   Undo2Icon,
 } from "lucide-react";
 import { type KeyboardEvent, useEffect, useState } from "react";
+import { toRichTextHeadingTag } from "@/lib/rich-text";
 import { cn } from "@/lib/utils";
 import Button from "../_ui/Button";
 import { Select } from "../_ui/Select";

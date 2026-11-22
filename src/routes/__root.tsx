@@ -1,14 +1,12 @@
 import {
   ClientOnly,
+  createRootRoute,
   HeadContent,
   Scripts,
-  createRootRoute,
 } from "@tanstack/react-router";
-
-import appCss from "../styles/styles.css?url";
 import { lazy, Suspense, useCallback, useMemo, useState } from "react";
-import Header from "@/components/_ui/Header";
 import Footer from "@/components/_ui/Footer";
+import Header from "@/components/_ui/Header";
 import { ToastProvider } from "@/components/_ui/Toast";
 import { THOUGHTS_FEED_PATH, THOUGHTS_FEED_TITLE } from "@/lib/posts";
 import {
@@ -21,6 +19,7 @@ import {
   withoutTrailingSlash,
 } from "@/lib/share";
 import { getSiteOrigin } from "@/server/functions/site.functions";
+import appCss from "../styles/styles.css?url";
 
 // Dev only. `import.meta.env.DEV` is false in production builds, so this
 // import (and the devtools packages) are dropped from them entirely.

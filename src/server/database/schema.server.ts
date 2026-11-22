@@ -249,7 +249,9 @@ export const media = pgTable(
       .$default(() => uuidv7()),
     /** Object key in the bucket, e.g. "media/{id}.jpg". */
     storageKey: text("storage_key").notNull().unique(),
-    status: text("status", { enum: MEDIA_STATUSES }).notNull().default("pending"),
+    status: text("status", { enum: MEDIA_STATUSES })
+      .notNull()
+      .default("pending"),
     /** The uploaded file's name, for display only. */
     originalName: text("original_name").notNull(),
     contentType: text("content_type").notNull(),

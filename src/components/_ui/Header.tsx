@@ -1,13 +1,8 @@
-import {
-  HammerIcon,
-  MenuIcon,
-  RssIcon,
-  UsersIcon,
-} from "lucide-react";
+import { Link as TanstackLink } from "@tanstack/react-router";
+import { HammerIcon, MenuIcon, RssIcon, UsersIcon } from "lucide-react";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 import Dropdown from "./Dropdown";
-import { Link as TanstackLink } from "@tanstack/react-router";
 
 interface HeaderProps extends ComponentProps<"header"> {
   title: string;
@@ -23,17 +18,17 @@ export default function Header({
   return (
     <header
       className={cn(
-        "w-full group sticky top-0 backdrop-blur-xl z-10",
+        "group sticky top-0 z-10 w-full backdrop-blur-xl",
         className,
       )}
       {...props}
     >
-      <div className="p-2 px-4 flex items-center gap-4 container max-w-4xl mx-auto">
+      <div className="container mx-auto flex max-w-4xl items-center gap-4 p-2 px-4">
         <Dropdown.Root>
           <Dropdown.Trigger size="icon">
             <MenuIcon strokeWidth={1.5} />
           </Dropdown.Trigger>
-          <Dropdown.Content className="p-3 gap-2! mt-2">
+          <Dropdown.Content className="mt-2 gap-2! p-3">
             <Dropdown.Item as="link" to="/thoughts">
               <RssIcon strokeWidth={1.5} size={16} />
               <span>Thoughts</span>
@@ -52,7 +47,7 @@ export default function Header({
         <h1 className="font-bold lg:text-lg" title="Digital Queer Collective">
           <TanstackLink
             to="/"
-            className="focus-visible:outline-1 focus-visible:outline-white focus-visible:outline-offset-2"
+            className="focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             {title}
           </TanstackLink>

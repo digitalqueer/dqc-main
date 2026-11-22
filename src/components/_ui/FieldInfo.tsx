@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
 import type { AnyFieldApi } from "@tanstack/react-form-start";
 import { type ComponentProps, useMemo } from "react";
+import { cn } from "@/lib/utils";
 
 interface FieldInfoProps extends ComponentProps<"span"> {
   field: AnyFieldApi;
@@ -25,7 +25,7 @@ export default function FieldInfo({ field, ...props }: FieldInfoProps) {
     return (
       <span
         {...props}
-        className={cn("block text-rose-300 text-sm italic", props.className)}
+        className={cn("block text-sm text-rose-300 italic", props.className)}
       >
         {errorMessages.join(", ")}
       </span>

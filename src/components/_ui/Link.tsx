@@ -2,10 +2,10 @@ import {
   type LinkComponentProps,
   Link as TanstackLink,
 } from "@tanstack/react-router";
-import type { ReactNode } from "react";
 import type { VariantProps } from "class-variance-authority";
-import { buttonVariants } from "./Button";
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "./Button";
 
 export type LinkProps = LinkComponentProps &
   VariantProps<typeof buttonVariants> & { children: ReactNode };

@@ -19,7 +19,10 @@ import {
   deleteProject,
   updateProject,
 } from "@/server/functions/projects.functions";
-import { type RecordFormProps, useMutationFeedback } from "./useMutationFeedback";
+import {
+  type RecordFormProps,
+  useMutationFeedback,
+} from "./useMutationFeedback";
 
 const STATUS_OPTIONS = PROJECT_STATUSES.map((value) => ({
   value,
@@ -99,7 +102,7 @@ function ProjectForm({
           form.handleSubmit();
         }}
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-4 px-2">
+        <div className="grid grid-cols-1 gap-2 px-2 pb-4 sm:grid-cols-2">
           <form.AppField
             name="name"
             listeners={{

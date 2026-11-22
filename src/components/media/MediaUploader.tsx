@@ -16,8 +16,8 @@ import {
   completeMediaUpload,
   createMediaUpload,
 } from "@/server/functions/media.functions";
-import Button from "../_ui/Button";
 import { useConfirm } from "../_ui/AlertDialog";
+import Button from "../_ui/Button";
 import {
   CONTROL_CLASSES,
   LABEL_CLASSES,
@@ -102,7 +102,9 @@ export function putFile(
     request.onload = () =>
       request.status >= 200 && request.status < 300
         ? resolve()
-        : reject(new Error(`Storage refused the file (HTTP ${request.status}).`));
+        : reject(
+            new Error(`Storage refused the file (HTTP ${request.status}).`),
+          );
     // A CORS rejection looks like a network error to the page.
     request.onerror = () =>
       reject(
@@ -194,7 +196,9 @@ export function MediaUploader({
 
   const patch = (key: number, changes: Partial<Upload>) =>
     set_uploads((list) =>
-      list.map((upload) => (upload.key === key ? { ...upload, ...changes } : upload)),
+      list.map((upload) =>
+        upload.key === key ? { ...upload, ...changes } : upload,
+      ),
     );
   const dismiss = (key: number) =>
     set_uploads((list) => list.filter((upload) => upload.key !== key));
@@ -274,7 +278,8 @@ export function MediaUploader({
     });
     if (added.length === 0) return;
     set_uploads((list) => [...list, ...added]);
-    for (const upload of added) if (upload.status === "waiting") enqueue(upload);
+    for (const upload of added)
+      if (upload.status === "waiting") enqueue(upload);
   };
 
   // A retry takes the tags as they are now (e.g. after fixing them).
@@ -293,7 +298,9 @@ export function MediaUploader({
     enqueue({ ...upload, ...changes });
   };
 
-  const in_progress = uploads.filter((upload) => upload.status !== "error").length;
+  const in_progress = uploads.filter(
+    (upload) => upload.status !== "error",
+  ).length;
   const failed = uploads.length - in_progress;
   useEffect(() => {
     latest.current.on_activity_change?.({ in_progress, failed });
@@ -309,7 +316,8 @@ export function MediaUploader({
       busy.current &&
       !(await confirm({
         title: "Leave while images upload?",
-        description: "Uploads are still in progress. Leaving this page stops them.",
+        description:
+          "Uploads are still in progress. Leaving this page stops them.",
         confirm_label: "Leave page",
         cancel_label: "Stay",
         is_destructive: true,
@@ -326,32 +334,29 @@ export function MediaUploader({
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <div className="flex flex-col">
-            <label htmlFor={`${field_id}-tags`} className={LABEL_CLASSES}>
-              Tags (comma-separated)
-            </label>
-            <input
-              id={`${field_id}-tags`}
-              type="text"
-              value={tags}
-              disabled={disabled}
-              placeholder="events, team"
-              aria-invalid={tags_problem ? true : undefined}
-              aria-describedby={
-                tags_problem
-                  ? `${field_id}-hint ${field_id}-tags-error`
-                  : `${field_id}-hint`
-              }
-              onChange={(event) => set_tags(event.target.value)}
-              className={cn(CONTROL_CLASSES, SINGLE_LINE_CONTROL_HEIGHT)}
-            />
-            {tags_problem && (
-              <p
-                id={`${field_id}-tags-error`}
-                className="text-sm text-rose-300"
-              >
-                {tags_problem}
-              </p>
-            )}
+          <label htmlFor={`${field_id}-tags`} className={LABEL_CLASSES}>
+            Tags (comma-separated)
+          </label>
+          <input
+            id={`${field_id}-tags`}
+            type="text"
+            value={tags}
+            disabled={disabled}
+            placeholder="events, team"
+            aria-invalid={tags_problem ? true : undefined}
+            aria-describedby={
+              tags_problem
+                ? `${field_id}-hint ${field_id}-tags-error`
+                : `${field_id}-hint`
+            }
+            onChange={(event) => set_tags(event.target.value)}
+            className={cn(CONTROL_CLASSES, SINGLE_LINE_CONTROL_HEIGHT)}
+          />
+          {tags_problem && (
+            <p id={`${field_id}-tags-error`} className="text-sm text-rose-300">
+              {tags_problem}
+            </p>
+          )}
         </div>
         <p id={`${field_id}-hint`} className="text-sm opacity-80">
           These apply to the images you add next. Each image's details can
@@ -362,7 +367,9 @@ export function MediaUploader({
         onDragEnter={on_drag_over}
         onDragOver={on_drag_over}
         onDragLeave={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          if (
+            !event.currentTarget.contains(event.relatedTarget as Node | null)
+          ) {
             set_is_dragging(false);
           }
         }}
@@ -374,9 +381,7 @@ export function MediaUploader({
         className={cn(
           "flex flex-col items-center justify-center gap-2 border border-dashed p-8 text-center transition-colors",
           "focus-within:outline focus-within:outline-offset-2 focus-within:outline-white",
-          is_dragging
-            ? "border-white bg-neutral-800"
-            : "border-neutral-600",
+          is_dragging ? "border-white bg-neutral-800" : "border-neutral-600",
           disabled
             ? "cursor-not-allowed opacity-60"
             : "cursor-pointer hover:border-white",
@@ -410,7 +415,8 @@ export function MediaUploader({
         {in_progress > 0 &&
           `Uploading ${in_progress} ${in_progress === 1 ? "file" : "files"}…`}
         {in_progress > 0 && failed > 0 && " "}
-        {failed > 0 && `${failed} ${failed === 1 ? "upload" : "uploads"} failed.`}
+        {failed > 0 &&
+          `${failed} ${failed === 1 ? "upload" : "uploads"} failed.`}
       </p>
 
       {uploads.length > 0 && (
@@ -418,17 +424,17 @@ export function MediaUploader({
           {uploads.map((upload) => (
             <li
               key={upload.key}
-              className="border border-neutral-700 flex items-center gap-4 p-2"
+              className="flex items-center gap-4 border border-neutral-700 p-2"
             >
-              <div className="flex flex-col gap-1 flex-1 min-w-0">
-                <p className="text-sm truncate">
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <p className="truncate text-sm">
                   <span className="font-medium">{upload.file.name}</span>{" "}
-                  <span className="opacity-80">{formatBytes(upload.file.size)}</span>
+                  <span className="opacity-80">
+                    {formatBytes(upload.file.size)}
+                  </span>
                 </p>
                 {upload.status === "error" ? (
-                  <p className="text-sm text-rose-300">
-                    {upload.error}
-                  </p>
+                  <p className="text-sm text-rose-300">{upload.error}</p>
                 ) : (
                   <div
                     role="progressbar"
@@ -445,7 +451,7 @@ export function MediaUploader({
                   </div>
                 )}
               </div>
-              <span aria-hidden className="text-sm opacity-80 tabular-nums">
+              <span aria-hidden className="text-sm tabular-nums opacity-80">
                 {statusLabel(upload)}
               </span>
               {upload.status === "error" &&

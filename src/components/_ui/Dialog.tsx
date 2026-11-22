@@ -1,3 +1,5 @@
+import { ClientOnly, useLayoutEffect } from "@tanstack/react-router";
+import { XIcon } from "lucide-react";
 import {
   type ComponentProps,
   createContext,
@@ -12,8 +14,6 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import Button, { type ButtonProps } from "@/components/_ui/Button";
-import { ClientOnly, useLayoutEffect } from "@tanstack/react-router";
-import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // The Invoker Commands API (`<button command="show-modal" commandfor="id">`)
@@ -126,7 +126,7 @@ function Content({ children, className, ...props }: ContentProps) {
           onCancel={() => context.onOpenChange(false)}
           onClose={() => context.onOpenChange(false)}
           className={cn(
-            "fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 group text-neutral-100 backdrop:bg-neutral-900/75 hidden open:flex flex-col overflow-y-auto max-h-[calc(100vh-4rem)] border bg-neutral-950 p-2 container max-w-4xl",
+            "group fixed top-1/2 left-1/2 container hidden max-h-[calc(100vh-4rem)] max-w-4xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-y-auto border bg-neutral-950 p-2 text-neutral-100 backdrop:bg-neutral-900/75 open:flex",
             className,
           )}
         >

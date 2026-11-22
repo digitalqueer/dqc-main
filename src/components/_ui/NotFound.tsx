@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
+import { cn } from "@/lib/utils";
 import Link from "./Link";
 import Main from "./Main";
-import { cn } from "@/lib/utils";
 
 const LOGO_ASCII_ART = `
 0000000000000         0000000000000        000000000000
@@ -27,7 +27,7 @@ function Logo({
     <pre
       {...props}
       className={cn(
-        "select-none text-[8px] text-neutral-300 md:text-sm lg:text-base",
+        "text-[8px] text-neutral-300 select-none md:text-sm lg:text-base",
         className,
       )}
       title="Digital Queer Collective"

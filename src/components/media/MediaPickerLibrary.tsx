@@ -69,7 +69,9 @@ export function MediaPickerLibrary({
       },
       (reason: unknown) => {
         if (!is_current) return;
-        set_error(reason instanceof Error ? reason.message : "Something went wrong.");
+        set_error(
+          reason instanceof Error ? reason.message : "Something went wrong.",
+        );
         set_is_loading(false);
       },
     );
@@ -82,7 +84,9 @@ export function MediaPickerLibrary({
     return (
       <div className="flex flex-wrap items-center gap-2 px-2">
         <p>Couldn't load the media library. {error}</p>
-        <Button onClick={() => set_attempt((count) => count + 1)}>Try again</Button>
+        <Button onClick={() => set_attempt((count) => count + 1)}>
+          Try again
+        </Button>
       </div>
     );
   }
@@ -106,7 +110,10 @@ export function MediaPickerLibrary({
   return (
     <div className="flex flex-col gap-4 px-2" aria-busy={is_loading}>
       {tags.length > 0 && (
-        <fieldset aria-label="Filter by tag" className="flex min-w-0 flex-wrap gap-2 text-sm">
+        <fieldset
+          aria-label="Filter by tag"
+          className="flex min-w-0 flex-wrap gap-2 text-sm"
+        >
           <button
             type="button"
             aria-pressed={!search.tag}
@@ -131,7 +138,7 @@ export function MediaPickerLibrary({
       {items.length > 0 ? (
         <ul
           className={cn(
-            "grid grid-cols-3 gap-2 sm:grid-cols-4 transition-opacity",
+            "grid grid-cols-3 gap-2 transition-opacity sm:grid-cols-4",
             is_loading && "opacity-60",
           )}
         >
@@ -156,7 +163,10 @@ export function MediaPickerLibrary({
         </p>
       )}
       {page_count > 1 && (
-        <nav aria-label="Pages" className="flex items-center justify-between gap-4">
+        <nav
+          aria-label="Pages"
+          className="flex items-center justify-between gap-4"
+        >
           <Button
             disabled={page <= 1 || is_loading}
             onClick={() => go_to({ ...search, page: page - 1 })}

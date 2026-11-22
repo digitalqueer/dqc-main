@@ -105,7 +105,7 @@ function RouteComponent() {
         )}
       />
       {projects_by_status[status].length === 0 && (
-        <p className="italic text-neutral-300">
+        <p className="text-neutral-300 italic">
           No {PROJECT_STATUS_LABELS[status].toLowerCase()} projects to show
         </p>
       )}
@@ -140,7 +140,7 @@ function RouteComponent() {
         <Dialog.Content className="max-w-2xl gap-2">
           {dialog && (
             <>
-              <div className="-mx-2 px-2 pb-2 border-b">
+              <div className="-mx-2 border-b px-2 pb-2">
                 <h2 className="text-2xl font-bold">
                   {dialog.item ? "Edit Project" : "New Project"}
                 </h2>

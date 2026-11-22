@@ -28,7 +28,10 @@ interface TurnstileRenderOptions {
 }
 
 interface TurnstileApi {
-  render(container: HTMLElement, options: TurnstileRenderOptions): string | undefined;
+  render(
+    container: HTMLElement,
+    options: TurnstileRenderOptions,
+  ): string | undefined;
   reset(widget_id: string): void;
   remove(widget_id: string): void;
 }
@@ -157,7 +160,7 @@ export function Turnstile({
       {/* Holds the widget's height (65px) so the form doesn't jump when it appears. */}
       <div ref={container_ref} className="min-h-[65px]" />
       {problem && (
-        <p role="alert" className="text-rose-300 text-sm">
+        <p role="alert" className="text-sm text-rose-300">
           {problem}
         </p>
       )}

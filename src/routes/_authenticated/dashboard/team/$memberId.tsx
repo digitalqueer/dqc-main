@@ -14,7 +14,9 @@ import {
   unpublishBio,
 } from "@/server/functions/team.functions";
 
-export const Route = createFileRoute("/_authenticated/dashboard/team/$memberId")({
+export const Route = createFileRoute(
+  "/_authenticated/dashboard/team/$memberId",
+)({
   loader: ({ params }) => {
     if (!isTeamMemberId(params.memberId)) throw notFound();
     return getBioEditor({ data: { id: params.memberId } });

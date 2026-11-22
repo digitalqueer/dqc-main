@@ -31,7 +31,11 @@ export function PostArticle({
         <article className="[&>:first-child]:mt-0">
           <h2 className="mb-2">{post.title}</h2>
           {post.author && <p className="text-sm">Written by {post.author}</p>}
-          <RichTextRenderer document={content} media={media} className="rich-text" />
+          <RichTextRenderer
+            document={content}
+            media={media}
+            className="rich-text"
+          />
           <p className="text-neutral-400">
             Published <PublishedDate date={post.publishedAt} />
             {revised_at && (

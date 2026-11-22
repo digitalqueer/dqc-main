@@ -147,7 +147,9 @@ export class MediaRepository {
    * where this looks (a jsonb containment check).
    */
   public async findMediaUsage(id: string): Promise<MediaUse[]> {
-    const needle = JSON.stringify([{ type: RICH_TEXT_IMAGE_TYPE, mediaId: id }]);
+    const needle = JSON.stringify([
+      { type: RICH_TEXT_IMAGE_TYPE, mediaId: id },
+    ]);
     const shows = (column: AnyPgColumn) =>
       sql<boolean>`coalesce(${column} -> 'root' -> 'children' @> ${needle}::jsonb, false)`;
     const [posts, pages, bios] = await Promise.all([

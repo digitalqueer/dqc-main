@@ -37,7 +37,7 @@ export function Select({
         aria-hidden
         strokeWidth={1.5}
         size={16}
-        className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 peer-disabled:opacity-60"
+        className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 peer-disabled:opacity-60"
       />
     </div>
   );

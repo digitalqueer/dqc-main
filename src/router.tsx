@@ -1,9 +1,8 @@
 import { createRouter as createTanstackRouter } from "@tanstack/react-router";
-
-// Import the generated route tree
-import { routeTree } from "./routeTree.gen";
 import ErrorView from "./components/_ui/ErrorView";
 import NotFound from "./components/_ui/NotFound";
+// Import the generated route tree
+import { routeTree } from "./routeTree.gen";
 
 // Create a new router instance
 export const getRouter = () => {

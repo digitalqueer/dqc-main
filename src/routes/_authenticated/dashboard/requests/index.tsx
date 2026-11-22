@@ -66,7 +66,7 @@ function RouteComponent() {
         {unread.length > 0 ? (
           render_list(unread)
         ) : (
-          <p className="italic text-neutral-300">
+          <p className="text-neutral-300 italic">
             No new messages. Messages sent from the home page's contact form
             show up here.
           </p>
@@ -84,7 +84,7 @@ function RouteComponent() {
         {read.items.length > 0 ? (
           render_list(read.items)
         ) : (
-          <p className="italic text-neutral-300">Nothing marked read yet.</p>
+          <p className="text-neutral-300 italic">Nothing marked read yet.</p>
         )}
         {read.page_count > 1 && (
           <nav

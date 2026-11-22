@@ -55,7 +55,7 @@ function ProjectPageEditor({
       <PublishingEditor
         title={project.name}
         details={
-          <p className="text-sm text-neutral-300 break-all">
+          <p className="text-sm break-all text-neutral-300">
             /projects/{project.id}
           </p>
         }

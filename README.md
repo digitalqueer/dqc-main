@@ -74,7 +74,8 @@ To run the dev server on the host instead, start the other services with `docker
 | `npm run typecheck`     | `tsc --noEmit`. There are no tests yet, so this is the check to run.                                                              |
 | `npm run gen-migration` | Generates a migration in `drizzle/` from changes to the schema                                                                    |
 | `npm run migrate`       | Applies pending migrations to `DATABASE_URL`                                                                                      |
-| `npm run check`         | Biome: formatting and lint                                                                                                        |
+| `npm run check`         | Biome: formatting, import order, lint and Tailwind class order. `npm run check -- --write` fixes what it safely can.              |
+| `npm run lint`          | Biome's lint rules only (`npm run format` is the formatter only)                                                                  |
 
 Inside Docker, prefix any of these with `docker compose exec app`.
 

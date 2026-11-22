@@ -14,8 +14,9 @@ import { PostsRepository } from "./repositories/posts.repository.server";
 import { escapeHtml, richTextToHtml } from "./rich-text-html.server";
 
 // XML 1.0 forbids most control characters, even escaped or inside CDATA.
-// biome-ignore lint/suspicious/noControlCharactersInRegex: matching them is the point
-const INVALID_XML_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g;
+const INVALID_XML_CHARS =
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: matching them is the point
+  /[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g;
 
 /** Text for an XML element or attribute. */
 function xmlText(value: string) {

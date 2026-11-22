@@ -126,7 +126,7 @@ function PostForm({
           form.handleSubmit();
         }}
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-4 px-2">
+        <div className="grid grid-cols-1 gap-2 px-2 pb-4 sm:grid-cols-2">
           <form.AppField
             name="title"
             listeners={{
@@ -185,10 +185,10 @@ function PostForm({
             )}
           </form.AppField>
           {item?.isPublished && (
-            <p className="sm:col-span-2 text-sm opacity-80">
+            <p className="text-sm opacity-80 sm:col-span-2">
               This post is live, so changing its kind or slug changes its URL
-              and breaks existing links to it. Details save straight to the
-              live post.
+              and breaks existing links to it. Details save straight to the live
+              post.
             </p>
           )}
           <form.AppField name="description">

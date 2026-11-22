@@ -1,4 +1,8 @@
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { FilePlusIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
@@ -72,7 +76,7 @@ function RouteComponent() {
         ))}
       </ul>
     ) : (
-      <p className="italic text-neutral-300">{empty}</p>
+      <p className="text-neutral-300 italic">{empty}</p>
     );
 
   return (
@@ -106,7 +110,7 @@ function RouteComponent() {
         <Dialog.Content className="max-w-2xl gap-2">
           {dialog && (
             <>
-              <div className="-mx-2 px-2 pb-2 border-b">
+              <div className="-mx-2 border-b px-2 pb-2">
                 <h2 className="text-2xl font-bold">
                   {dialog.item ? "Post Details" : "New Post"}
                 </h2>

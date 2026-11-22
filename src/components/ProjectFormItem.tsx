@@ -38,21 +38,21 @@ function ProjectFormItem({
 
   return (
     <div
-      className={cn("border border-neutral-700 flex flex-col p-2", className)}
+      className={cn("flex flex-col border border-neutral-700 p-2", className)}
       {...props}
     >
       <div className="flex items-start gap-4">
         <Button size="icon" {...drag_handle}>
           <GripIcon strokeWidth={1.5} size={16} aria-hidden />
         </Button>
-        <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex min-w-0 flex-1 flex-col">
           <p className="text-sm text-neutral-300">
             {projectDates(item)} ·{" "}
             {item.hasPublishedPage ? "Page published" : "No page yet"}
           </p>
           <p className="font-medium">
             {item.name}
-            <span className="text-neutral-300 font-normal text-sm break-all">
+            <span className="text-sm font-normal break-all text-neutral-300">
               {" "}
               /projects/{item.id}
             </span>
@@ -124,7 +124,7 @@ function ProjectFormItem({
                     href={item.websiteLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="underline break-all"
+                    className="break-all underline"
                   >
                     {item.websiteLink}
                   </a>
@@ -132,12 +132,16 @@ function ProjectFormItem({
               )}
               {item.sourceLink && (
                 <li className="flex items-center gap-2">
-                  <CodeIcon strokeWidth={1.5} size={14} aria-label="Source code" />
+                  <CodeIcon
+                    strokeWidth={1.5}
+                    size={14}
+                    aria-label="Source code"
+                  />
                   <a
                     href={item.sourceLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="underline break-all"
+                    className="break-all underline"
                   >
                     {item.sourceLink}
                   </a>

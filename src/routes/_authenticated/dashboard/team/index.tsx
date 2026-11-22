@@ -1,4 +1,8 @@
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { UserPlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -107,7 +111,7 @@ function RouteComponent() {
           )}
         />
         {members.length === 0 && (
-          <p className="italic text-neutral-300">
+          <p className="text-neutral-300 italic">
             No one yet. Add someone with the + button.
           </p>
         )}
@@ -119,14 +123,14 @@ function RouteComponent() {
         <Dialog.Content className="max-w-2xl gap-2">
           {dialog && (
             <>
-              <div className="-mx-2 px-2 pb-2 border-b">
+              <div className="-mx-2 border-b px-2 pb-2">
                 <h2 className="text-2xl font-bold">
                   {dialog.item ? "Edit Team Member" : "Add to the Team"}
                 </h2>
                 {!dialog.item && (
                   <p className="text-sm text-neutral-300">
-                    They join the About page once their bio is published;
-                    you'll write it next.
+                    They join the About page once their bio is published; you'll
+                    write it next.
                   </p>
                 )}
               </div>

@@ -85,7 +85,8 @@ export function useUnsavedChangesGuard(is_dirty: boolean) {
       dirty_ref.current &&
       !(await confirm({
         title: "Leave without saving?",
-        description: "You have unsaved changes. They'll be lost if you leave this page.",
+        description:
+          "You have unsaved changes. They'll be lost if you leave this page.",
         confirm_label: "Leave page",
         cancel_label: "Stay",
         is_destructive: true,

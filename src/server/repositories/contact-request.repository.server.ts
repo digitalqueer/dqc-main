@@ -1,7 +1,10 @@
 import { and, desc, eq, isNotNull, isNull } from "drizzle-orm";
 import { CONTACT_REQUESTS_PAGE_SIZE } from "@/lib/contact";
 import type { AppDatabase } from "../database/index.server";
-import { contactRequest, type NewContactRequest } from "../database/schema.server";
+import {
+  contactRequest,
+  type NewContactRequest,
+} from "../database/schema.server";
 
 const NEWEST_FIRST = [
   desc(contactRequest.createdAt),

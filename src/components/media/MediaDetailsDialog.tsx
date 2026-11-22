@@ -80,7 +80,9 @@ function MediaUsage({ uses }: { uses: MediaUse[] | null | "error" }) {
     return <p className="text-sm opacity-80">Checking where it's used…</p>;
   }
   if (uses === "error") {
-    return <p className="text-sm opacity-80">Couldn't check where it's used.</p>;
+    return (
+      <p className="text-sm opacity-80">Couldn't check where it's used.</p>
+    );
   }
   if (uses.length === 0) {
     return <p className="text-sm opacity-80">Not used on any page.</p>;
@@ -185,7 +187,9 @@ function MediaDetails({ item, on_close, on_changed }: MediaDetailsProps) {
       is_destructive: true,
     });
     if (!confirmed) return;
-    const deleted = await run("delete", () => remove({ data: { id: item.id } }));
+    const deleted = await run("delete", () =>
+      remove({ data: { id: item.id } }),
+    );
     if (deleted) {
       on_close();
       await on_changed();
@@ -200,7 +204,7 @@ function MediaDetails({ item, on_close, on_changed }: MediaDetailsProps) {
 
   return (
     <>
-      <div className="-mx-2 px-2 pb-2 pr-12 border-b">
+      <div className="-mx-2 border-b px-2 pr-12 pb-2">
         <h2 className="text-2xl font-bold break-all">{item.originalName}</h2>
         <p className="text-sm opacity-80">
           {facts.join(" · ")} · uploaded <LocalTime date={item.createdAt} />
@@ -232,7 +236,7 @@ function MediaDetails({ item, on_close, on_changed }: MediaDetailsProps) {
             form.handleSubmit();
           }}
         >
-          <div className="grid grid-cols-1 gap-2 pb-4 px-2">
+          <div className="grid grid-cols-1 gap-2 px-2 pb-4">
             <form.AppField name="altText">
               {(field) => (
                 <field.TextAreaField
@@ -277,7 +281,10 @@ interface MediaDetailsDialogProps extends Omit<MediaDetailsProps, "item"> {
 }
 
 /** Preview, alt text and caption, and delete, for one library item. */
-export function MediaDetailsDialog({ item, ...props }: MediaDetailsDialogProps) {
+export function MediaDetailsDialog({
+  item,
+  ...props
+}: MediaDetailsDialogProps) {
   return (
     <Dialog.Root
       open={item !== null}

@@ -48,20 +48,23 @@ function TeamMemberItem({
 }: TeamMemberItemProps) {
   return (
     <div
-      className={cn("border border-neutral-700 flex items-start gap-4 p-2", className)}
+      className={cn(
+        "flex items-start gap-4 border border-neutral-700 p-2",
+        className,
+      )}
       {...props}
     >
       <Button size="icon" {...drag_handle}>
         <GripIcon strokeWidth={1.5} size={16} aria-hidden />
       </Button>
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex min-w-0 flex-1 flex-col">
         <p className="text-sm text-neutral-300">
           <BioStatus status={item.status} />
         </p>
         <p className="font-medium">
           {item.name}
           {item.pronouns && (
-            <span className="text-neutral-300 font-normal text-sm">
+            <span className="text-sm font-normal text-neutral-300">
               {" "}
               {item.pronouns}
             </span>
