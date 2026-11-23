@@ -1,13 +1,12 @@
-import { ReactNode, useCallback, useId, useState } from "react";
+import { type ReactNode, useCallback, useId, useState } from "react";
 import Dialog from "../_ui/Dialog";
 import Button from "../_ui/Button";
 import { ContactForm } from "../forms/ContactForm";
 import { closeDialog } from "@/lib/utils";
-import type { ValidContactRequestResponse } from "@/server/contact/contact.server";
 
 interface ContactDialogProps {
   children: ReactNode;
-  /** From getContactFormServerFn; null while Turnstile isn't configured. */
+  /** From getContactForm; null while Turnstile isn't configured. */
   turnstileSiteKey: string | null;
 }
 
@@ -18,12 +17,9 @@ export default function ContactDialog({
   const formId = useId();
   const [dialogId, setDialogId] = useState<string | null>(null);
 
-  const handleValidResponse = useCallback(
-    (_response: ValidContactRequestResponse) => {
-      if (dialogId) closeDialog(dialogId);
-    },
-    [dialogId],
-  );
+  const handleSent = useCallback(() => {
+    if (dialogId) closeDialog(dialogId);
+  }, [dialogId]);
 
   return (
     <Dialog.Root idSetter={setDialogId}>
@@ -39,7 +35,7 @@ export default function ContactDialog({
         <ContactForm
           id={formId}
           turnstileSiteKey={turnstileSiteKey}
-          onValidResponse={handleValidResponse}
+          onSent={handleSent}
           className="px-2 pb-4 pt-2"
         />
 

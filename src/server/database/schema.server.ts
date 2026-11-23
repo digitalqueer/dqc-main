@@ -87,21 +87,36 @@ export const verification = pgTable(
 
 // <-- Contact requests -->
 /** Messages sent from the public contact form, after the Turnstile check. */
-export const contactRequestTable = pgTable("contact_requests", {
-  id: uuid()
-    .primaryKey()
-    .$default(() => uuidv7()),
-  firstName: varchar("first_name", { length: 255 }).notNull(),
-  lastName: varchar("last_name", { length: 255 }).notNull(),
-  email: varchar("email_address", { length: 255 }).notNull(),
-  comment: text("comment").notNull(),
-  communicationsConsent: boolean("communications_consent").default(false),
-  /** The Resend contact made when they opted in to communications. */
-  communicationsId: char("communications_id", { length: 36 }),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
-});
-export type InsertableContactRequest = typeof contactRequestTable.$inferInsert;
-export type SelectableContactRequest = typeof contactRequestTable.$inferSelect;
+export const contactRequest = pgTable(
+  "contact_requests",
+  {
+    id: uuid()
+      .primaryKey()
+      .$default(() => uuidv7()),
+    firstName: varchar("first_name", { length: 255 }).notNull(),
+    lastName: varchar("last_name", { length: 255 }).notNull(),
+    email: varchar("email_address", { length: 255 }).notNull(),
+    comment: text("comment").notNull(),
+    /** They asked to join DQC's newsletters and future communications. */
+    communicationsConsent: boolean("communications_consent").default(false),
+    /**
+     * Their Resend contact, made when they opted in. Null with consent means
+     * adding them to Resend failed (see the server log), so it's still to do.
+     */
+    communicationsId: char("communications_id", { length: 36 }),
+    /** When it was marked read in the admin; null while it's new. */
+    readAt: timestamp("read_at"),
+    createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  },
+  (table) => [
+    index("contact_request_read_at_created_at_idx").on(
+      table.readAt,
+      table.createdAt,
+    ),
+  ],
+);
+export type ContactRequest = typeof contactRequest.$inferSelect;
+export type NewContactRequest = typeof contactRequest.$inferInsert;
 
 // <-- Relations -->
 export const schema = {
@@ -109,5 +124,5 @@ export const schema = {
   session,
   account,
   verification,
-  contactRequestTable,
+  contactRequest,
 } as const;

@@ -72,13 +72,13 @@ Inside Docker, prefix any of these with `docker compose exec app`.
 
 See [`.env.example`](.env.example) for every variable, with comments. Server code reads them through `getServerEnv()` in [`src/server/env.server.ts`](src/server/env.server.ts), on each call and never at module scope. Nothing is built into the client bundle, so the image builds without any of them.
 
-| Variables                                                                                                              | Used for                         | Without them                     |
-| ---------------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------- |
-| `DATABASE_URL`                                                                                                         | Postgres                         | Nothing works                    |
-| `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`                                                                                | Sessions and the OAuth callback  | Sign-in fails                    |
-| `DQC_CLIENT_ID`, `DQC_CLIENT_SECRET`, `DQC_AUTHORIZE_URL`, `DQC_TOKEN_URL`, `DQC_USER_INFO_URL`, `DQC_END_SESSION_URL` | The OAuth provider               | Sign-in fails                    |
-| `VITE_CLOUDFLARE_SITEKEY`, `CLOUDFLARE_SECRET_KEY`                                                                     | Turnstile on the contact form    | The contact form is switched off |
-| `RESEND_SECRET_KEY`                                                                                                    | The contact form's mail opt-in   | Opting in fails                  |
+| Variables                                                                                                              | Used for                        | Without them                                                           |
+| ---------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------- |
+| `DATABASE_URL`                                                                                                         | Postgres                        | Nothing works                                                          |
+| `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`                                                                                | Sessions and the OAuth callback | Sign-in fails                                                          |
+| `DQC_CLIENT_ID`, `DQC_CLIENT_SECRET`, `DQC_AUTHORIZE_URL`, `DQC_TOKEN_URL`, `DQC_USER_INFO_URL`, `DQC_END_SESSION_URL` | The OAuth provider              | Sign-in fails                                                          |
+| `VITE_CLOUDFLARE_SITEKEY`, `CLOUDFLARE_SECRET_KEY`                                                                     | Turnstile on the contact form   | The contact form is switched off                                       |
+| `RESEND_SECRET_KEY`                                                                                                    | The contact form's mail opt-in  | Messages are still saved, but people who opt in aren't added to Resend |
 
 ## Project layout
 
@@ -104,14 +104,17 @@ See [`.env.example`](.env.example) for every variable, with comments. Server cod
     ├── lib/                  Client-safe: constants, Zod schemas, pure helpers
     ├── server/               Server-only code
     │   ├── functions/        Server functions (*.functions.ts): the app's API
-    │   ├── middleware/       Function middleware (*.middleware.ts)
+    │   ├── middleware/       Function middleware (*.middleware.ts): auth, repositories
+    │   ├── repositories/     Database access, one class per table (*.repository.server.ts)
     │   ├── database/         Drizzle client, schema, relations, migrator
     │   ├── auth.server.ts    Better Auth instance
+    │   ├── resend.server.ts  Adds people who opt in to Resend's contacts
+    │   ├── turnstile.server.ts  Checks Turnstile tokens with Cloudflare
     │   └── env.server.ts     Environment access
     └── styles/
 ```
 
-`src/server/contact/`, `src/server/thoughts/` and `src/server/turnstile/` predate this layout. They're moving into `functions/`, `middleware/` and `repositories/`, with their schemas in `src/lib`, as each feature gets its admin pages.
+`src/server/thoughts/` predates this layout. It moves into `functions/`, `middleware/` and `repositories/`, with its schemas in `src/lib`, when thoughts get their admin pages.
 
 ## How a request flows
 
@@ -139,6 +142,23 @@ flowchart LR
 - **Data.** Each admin server function uses `ensure_auth_middleware` from [`auth.middleware.ts`](src/server/middleware/auth.middleware.ts). The route guard only hides pages, so the middleware is what actually protects the data.
 - **Who's an admin.** Any signed-in session counts. Who can sign in is decided by the dqc-main application's settings in DQC's sign-in service, not by this app.
 - **Signing out** (the footer's button) ends the session here and at the provider (`DQC_END_SESSION_URL`), then comes back to `/`. The footer's 🏳️‍🌈 is the way in to `/login`.
+
+## Contact form
+
+The contact form is the first feature built on this pattern, so it's a good one to copy from:
+
+- **Schemas** live in [`src/lib/contact.ts`](src/lib/contact.ts), shared by the form and the server functions.
+- **Server functions** are in [`contact.functions.ts`](src/server/functions/contact.functions.ts). The public ones are `getContactForm` (the home page's loader, which hands out the Turnstile site key) and `submitContactRequest`. The admin ones list requests, mark them read or new, and delete them.
+- **Middleware and repository:** [`contact.middleware.ts`](src/server/middleware/contact.middleware.ts) puts a [`ContactRequestRepository`](src/server/repositories/contact-request.repository.server.ts) in `context`.
+
+Sending a message:
+
+1. The [`Turnstile`](src/components/Turnstile.tsx) widget loads Cloudflare's script when the form first renders, then hands the form a token.
+2. `submitContactRequest` checks the token with [`turnstile.server.ts`](src/server/turnstile.server.ts). It answers 400 if Cloudflare rejects the token, and 503 if Cloudflare can't be reached. The form resets the widget after every attempt, since each token works only once.
+3. If the person opted in, [`resend.server.ts`](src/server/resend.server.ts) adds them to Resend's contacts.
+4. The message is saved. It's saved even when the Resend step fails: the failure is logged, and the request is stored with consent but no `communications_id`.
+
+Each request has a `read_at` column: null while it's new, and the time it was first read once an admin opens it.
 
 ## Migrations
 
