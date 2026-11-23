@@ -7,11 +7,12 @@ import {
   useEffect,
   useId,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
 import Button, { ButtonProps } from "@/components/_ui/Button";
-import { ClientOnly } from "@tanstack/react-router";
+import { ClientOnly, useLayoutEffect } from "@tanstack/react-router";
 import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,8 @@ declare module "react" {
 interface DialogContextValue {
   id: string;
   open: boolean;
+  /** Set when the Root gets `open`, so Content opens and closes the <dialog> to match. */
+  controlled: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
@@ -75,6 +78,7 @@ function Root({ children, idSetter, open, onOpenChange }: DialogRootProps) {
       value={{
         id,
         open: resolvedOpenState,
+        controlled: typeof open !== "undefined",
         onOpenChange: handleOpenChange,
       }}
     >
@@ -101,6 +105,16 @@ interface ContentProps
 
 function Content({ children, className, ...props }: ContentProps) {
   const context = useDialogContext();
+  const dialog_ref = useRef<HTMLDialogElement | null>(null);
+
+  // A controlled Root opens and closes the dialog from state; otherwise
+  // Invoker Commands buttons (Dialog.Action) do it without JavaScript.
+  useLayoutEffect(() => {
+    const dialog = dialog_ref.current;
+    if (!context.controlled || !dialog) return;
+    if (context.open && !dialog.open) dialog.showModal();
+    else if (!context.open && dialog.open) dialog.close();
+  }, [context.controlled, context.open]);
 
   return (
     <ClientOnly>
@@ -108,10 +122,11 @@ function Content({ children, className, ...props }: ContentProps) {
         <dialog
           {...props}
           id={context.id}
+          ref={dialog_ref}
           onCancel={() => context.onOpenChange(false)}
           onClose={() => context.onOpenChange(false)}
           className={cn(
-            "fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 group text-neutral-100 backdrop:bg-neutral-900/75 hidden open:flex flex-col overflow-y-auto max-h-[100vh-4rem)] border bg-neutral-950 p-2 container max-w-4xl",
+            "fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 group text-neutral-100 backdrop:bg-neutral-900/75 hidden open:flex flex-col overflow-y-auto max-h-[calc(100vh-4rem)] border bg-neutral-950 p-2 container max-w-4xl",
             className,
           )}
         >
@@ -120,10 +135,11 @@ function Content({ children, className, ...props }: ContentProps) {
             variant="default"
             size="icon"
             className="absolute top-1 right-1"
+            aria-label="Close"
             command="close"
             commandfor={context.id}
           >
-            <XIcon className="size-4" />
+            <XIcon className="size-4" aria-hidden />
           </Button>
         </dialog>,
         document.body,

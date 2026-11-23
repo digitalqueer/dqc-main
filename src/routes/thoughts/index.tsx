@@ -1,54 +1,59 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link as TanstackLink } from "@tanstack/react-router";
+import { ArrowRightIcon } from "lucide-react";
+import Link from "@/components/_ui/Link";
 import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
-import Link from "@/components/_ui/Link";
-import { Link as TanstackLink } from "@tanstack/react-router";
-import { getThoughtsListServerFn } from "@/server/thoughts/thoughts.functions";
-import { ArrowRightIcon } from "lucide-react";
+import { PublishedDate } from "@/components/_ui/PublishedDate";
+import { listPublishedThoughts } from "@/server/functions/posts.functions";
 
 export const Route = createFileRoute("/thoughts/")({
+  loader: () => listPublishedThoughts(),
+  head: () => ({
+    meta: [{ title: "Thoughts - Digital Queer Collective" }],
+  }),
   component: RouteComponent,
-  ssr: true,
-  loader: () => getThoughtsListServerFn(),
 });
 
 function RouteComponent() {
-  const entries = Route.useLoaderData();
+  const thoughts = Route.useLoaderData();
 
   return (
     <Main>
       <Prose>
         <h2>Thoughts</h2>
-        {entries.map((entry) => (
-          <section key={entry.slug}>
-            <h3>
-              <TanstackLink
-                className="no-underline font-bold"
-                to="/thoughts/$slug"
-                params={{ slug: entry.slug }}
-              >
-                {entry.title}
-              </TanstackLink>
-            </h3>
-            {entry.description && <p className="mb-4">{entry.description}</p>}
-            <div className="flex items-center justify-between">
-              <Link
-                to="/thoughts/$slug"
-                params={{ slug: entry.slug }}
-                className="-ml-3"
-              >
-                <span>View Post</span>
-                <ArrowRightIcon strokeWidth={1.5} className="size-4" />
-              </Link>
-              {entry.publishedAt && (
-                <p className="text-sm m-0!">
-                  {entry.publishedAt?.toLocaleDateString()}
-                </p>
-              )}
-            </div>
-          </section>
-        ))}
-        {/*<h2>Statements</h2>*/}
+        {thoughts.length === 0 && <p className="italic">Nothing here yet.</p>}
+        {thoughts.map((thought) => {
+          const summary = thought.description ?? thought.excerpt;
+          return (
+            <section key={thought.id}>
+              <h3>
+                <TanstackLink
+                  className="no-underline font-bold"
+                  to="/thoughts/$slug"
+                  params={{ slug: thought.slug }}
+                >
+                  {thought.title}
+                </TanstackLink>
+              </h3>
+              {summary && <p className="mb-4">{summary}</p>}
+              <div className="flex items-center justify-between">
+                <Link
+                  to="/thoughts/$slug"
+                  params={{ slug: thought.slug }}
+                  className="-ml-3"
+                >
+                  <span>View Post</span>
+                  <ArrowRightIcon strokeWidth={1.5} className="size-4" aria-hidden />
+                </Link>
+                {thought.publishedAt && (
+                  <p className="text-sm m-0!">
+                    <PublishedDate date={thought.publishedAt} />
+                  </p>
+                )}
+              </div>
+            </section>
+          );
+        })}
       </Prose>
     </Main>
   );
