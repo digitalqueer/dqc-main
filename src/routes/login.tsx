@@ -19,6 +19,7 @@ const loginSearchSchema = z.object({
 });
 
 export const Route = createFileRoute("/login")({
+  staticData: { breadcrumb: "Sign In" },
   validateSearch: loginSearchSchema,
   component: RouteComponent,
 });

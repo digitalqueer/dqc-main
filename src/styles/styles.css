@@ -4,8 +4,9 @@
 
 body {
   font-family:
-    "Nudica", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    "Nudica", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -46,12 +47,21 @@ h6 {
   }
 
   a:focus-visible {
-      @apply outline-offset-2 outline-1 outline-white;
+    @apply outline-offset-2 outline-1 outline-white;
   }
 }
 
 @theme {
   /*"Nudica Mono",*/
   --font-mono:
-    "Nudica Mono", source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+    "Nudica Mono", source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/* Rich text (RichTextEditor / RichTextRenderer): inline code is shown as a
+   chip, so drop the typography plugin's decorative backticks. Unlayered, so it
+   wins over the plugin's rules regardless of order. */
+.rich-text :where(code)::before,
+.rich-text :where(code)::after {
+  content: none;
 }

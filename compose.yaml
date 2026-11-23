@@ -2,6 +2,8 @@
 #
 #   app       TanStack Start dev server; the source is mounted, so edits hot-reload
 #   postgres  database; pending migrations run each time the app starts
+#   rustfs    S3-compatible storage for media; console at http://localhost:9001
+#   imgproxy  renders media straight from the bucket
 #
 # The app still reads the rest of its settings (BETTER_AUTH_*, DQC_*, ...) from
 # .env; the values below replace the same names from there. Every credential
@@ -10,11 +12,18 @@
 # To run the dev server on the host instead, start only the database
 # (`docker compose up postgres`) and point DATABASE_URL in .env at it.
 #
-# The Postgres host port can be moved with POSTGRES_PORT (set it in the shell
-# or .env). `docker compose down -v` deletes the database and the installed
-# node_modules.
+# Host ports can be moved with POSTGRES_PORT, S3_PORT, S3_CONSOLE_PORT and
+# IMGPROXY_PORT (set them in the shell or .env). `docker compose down -v`
+# deletes the database, the uploaded files and the installed node_modules.
 
 name: dqc-main
+
+x-dev-values:
+  bucket: &bucket dqc-media
+  s3-access-key: &s3-access-key dqc
+  s3-secret-key: &s3-secret-key dqc-dev-secret
+  imgproxy-key: &imgproxy-key e3dccd691b04fa72fa5805d933b60d348ce3d84ad01263324e06ed94bac562a0
+  imgproxy-salt: &imgproxy-salt 53a569323796d1d381a94dd22e0b41567f00c185ce93006cb3fb84c5ebdddaf5
 
 services:
   app:
@@ -31,8 +40,26 @@ services:
       - npm-cache:/root/.npm
     environment:
       DATABASE_URL: postgresql://dqc:dqc@postgres:5432/dqc
+      S3_BUCKET: *bucket
+      S3_REGION: us-east-1
+      S3_ENDPOINT: http://rustfs:9000
+      # Upload URLs are signed for the host the browser sends them to.
+      S3_PUBLIC_ENDPOINT: http://localhost:${S3_PORT:-9000}
+      S3_FORCE_PATH_STYLE: "true"
+      S3_ACCESS_KEY_ID: *s3-access-key
+      S3_SECRET_ACCESS_KEY: *s3-secret-key
+      # Pages allowed to upload to the bucket (docker/setup-bucket.mjs).
+      S3_CORS_ORIGINS: http://localhost:3000
+      IMGPROXY_URL: http://localhost:${IMGPROXY_PORT:-8080}
+      IMGPROXY_KEY: *imgproxy-key
+      IMGPROXY_SALT: *imgproxy-salt
+      IMGPROXY_SOURCE_PREFIX: ""
     depends_on:
       postgres:
+        condition: service_healthy
+      rustfs:
+        condition: service_healthy
+      imgproxy:
         condition: service_healthy
 
   postgres:
@@ -52,7 +79,52 @@ services:
       timeout: 5s
       retries: 30
 
+  rustfs:
+    image: rustfs/rustfs:1.0.6
+    environment:
+      RUSTFS_ACCESS_KEY: *s3-access-key
+      RUSTFS_SECRET_KEY: *s3-secret-key
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+    ports:
+      - "${S3_PORT:-9000}:9000"
+      - "${S3_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - rustfs-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/health"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  imgproxy:
+    image: ghcr.io/imgproxy/imgproxy:v4.0.24
+    environment:
+      IMGPROXY_KEY: *imgproxy-key
+      IMGPROXY_SALT: *imgproxy-salt
+      IMGPROXY_USE_S3: "true"
+      IMGPROXY_S3_ENDPOINT: http://rustfs:9000
+      IMGPROXY_S3_ENDPOINT_USE_PATH_STYLE: "true"
+      IMGPROXY_S3_REGION: us-east-1
+      IMGPROXY_S3_ALLOWED_BUCKETS: *bucket
+      IMGPROXY_ALLOWED_SOURCES: s3://dqc-media/
+      AWS_ACCESS_KEY_ID: *s3-access-key
+      AWS_SECRET_ACCESS_KEY: *s3-secret-key
+      IMGPROXY_DEVELOPMENT_ERRORS_MODE: "true"
+    ports:
+      - "${IMGPROXY_PORT:-8080}:8080"
+    depends_on:
+      rustfs:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "imgproxy", "health"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
 volumes:
   app-node-modules:
   npm-cache:
   postgres-data:
+  rustfs-data:

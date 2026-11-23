@@ -1,8 +1,8 @@
 import { type ReactNode, useCallback, useId, useState } from "react";
-import Dialog from "../_ui/Dialog";
-import Button from "../_ui/Button";
-import { ContactForm } from "../forms/ContactForm";
 import { closeDialog } from "@/lib/utils";
+import Button from "../_ui/Button";
+import Dialog from "../_ui/Dialog";
+import { ContactForm } from "../forms/ContactForm";
 
 interface ContactDialogProps {
   children: ReactNode;
@@ -25,9 +25,9 @@ export default function ContactDialog({
     <Dialog.Root idSetter={setDialogId}>
       {children}
       <Dialog.Content className="max-w-2xl">
-        <div className="-mx-2 px-2 pb-2 border-b">
+        <div className="-mx-2 border-b px-2 pb-2">
           <h2 className="font-mono text-2xl font-bold">Get In Touch</h2>
-          <h3 className="font-mono text-neutral-400 text-sm">
+          <h3 className="font-mono text-sm text-neutral-400">
             We'd love to hear from a future partner, ally, or member
           </h3>
         </div>
@@ -36,10 +36,10 @@ export default function ContactDialog({
           id={formId}
           turnstileSiteKey={turnstileSiteKey}
           onSent={handleSent}
-          className="px-2 pb-4 pt-2"
+          className="px-2 pt-2 pb-4"
         />
 
-        <div className="-mx-2 pt-2 px-2 border-t flex items-center justify-end">
+        <div className="-mx-2 flex items-center justify-end border-t px-2 pt-2">
           <Button form={formId} type="submit">
             Contact Us
           </Button>

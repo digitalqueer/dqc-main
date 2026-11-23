@@ -1,23 +1,27 @@
-import { Prettify } from "@/lib/utils";
+import type { Placement } from "@floating-ui/react";
 import { ClientOnly } from "@tanstack/react-router";
-import { Placement } from "@floating-ui/react";
 import {
   AlertTriangleIcon,
   CheckIcon,
-  LucideIcon,
+  type LucideIcon,
   OctagonXIcon,
   XIcon,
 } from "lucide-react";
 import {
   createContext,
-  ReactNode,
+  type ReactNode,
   useCallback,
   useContext,
+  useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
+  useRef,
+  useState,
 } from "react";
 import { createPortal } from "react-dom";
 import { v7 as uuidv7 } from "uuid";
+import type { Prettify } from "@/lib/utils";
 import Button from "./Button";
 
 type ToastType = "basic" | "success" | "warning" | "danger";
@@ -48,10 +52,7 @@ function Toast({ onDismiss, toast }: ToastProps) {
   }, [toast.type]);
 
   return (
-    <output
-      role="status"
-      className="block pointer-events-none border bg-neutral-950 p-2 w-full"
-    >
+    <output className="pointer-events-none block w-full border bg-neutral-950 p-2">
       <div className="flex items-center gap-2">
         {Icon && <Icon className="size-4 shrink-0" />}
         <span className="grow">{toast.title}</span>
@@ -64,7 +65,7 @@ function Toast({ onDismiss, toast }: ToastProps) {
         </Button>
       </div>
       {toast.description && (
-        <p className="text-sm text-neutral-300 mt-2">{toast.description}</p>
+        <p className="mt-2 text-sm text-neutral-300">{toast.description}</p>
       )}
     </output>
   );
@@ -76,9 +77,58 @@ interface ToastContainerProps {
   toasts: Toast[];
 }
 
+/**
+ * The open modal <dialog>, if any. While one is open, the rest of the page is
+ * inert: nothing outside the dialog can be clicked or is read out by screen
+ * readers, even if it's drawn on top.
+ */
+function useOpenModalDialog() {
+  const [dialog, set_dialog] = useState<HTMLDialogElement | null>(null);
+
+  useEffect(() => {
+    const update = () => {
+      const open = document.querySelectorAll<HTMLDialogElement>("dialog:modal");
+      set_dialog(open.length > 0 ? open[open.length - 1] : null);
+    };
+    update();
+    // showModal() and close() add and remove the `open` attribute.
+    const observer = new MutationObserver(update);
+    observer.observe(document.body, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["open"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  return dialog;
+}
+
+/** Browser only: render inside <ClientOnly>. */
 function ToastContainer({ onDismiss, toasts }: ToastContainerProps) {
-  return (
-    <section className="fixed top-0 inset-x-0 z-1 mx-auto pointer-events-none max-w-sm h-8 pt-2 flex flex-col gap-2">
+  const ref = useRef<HTMLElement>(null);
+  const modal = useOpenModalDialog();
+
+  // A manual popover sits in the browser's top layer, so the toasts are drawn
+  // above a modal <dialog> and its backdrop. Putting them inside the open
+  // modal keeps them clickable and announced too (see useOpenModalDialog).
+  // Showing the popover again moves it above anything opened since.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `modal` isn't read, but a modal opening or closing has to re-show the popover so it stays on top.
+  useLayoutEffect(() => {
+    const container = ref.current;
+    if (!container) return;
+    if (container.matches(":popover-open")) container.hidePopover();
+    if (toasts.length > 0) container.showPopover();
+  }, [toasts.length, modal]);
+
+  return createPortal(
+    <section
+      ref={ref}
+      popover="manual"
+      aria-label="Notifications"
+      // Undoes the popover's default look (centered, bordered, Canvas colors).
+      className="pointer-events-none fixed inset-x-0 top-0 bottom-auto mx-auto hidden h-fit w-full max-w-sm flex-col gap-2 overflow-visible bg-transparent p-2 text-neutral-100 open:flex"
+    >
       {toasts.map((toast) => (
         <Toast
           key={toast.id}
@@ -86,7 +136,8 @@ function ToastContainer({ onDismiss, toasts }: ToastContainerProps) {
           toast={toast}
         />
       ))}
-    </section>
+    </section>,
+    modal ?? document.body,
   );
 }
 
@@ -133,7 +184,7 @@ function ToastProvider({ children, placement }: ToastProviderProps) {
       const toast = { id: uuidv7(), type, ...data };
       dispatch({ type: "add-toast", data: toast });
       setTimeout(() => {
-        handleDismissToast(toast.id);
+        dispatch({ type: "dismiss-toast", data: { id: toast.id } });
       }, toast.ttl ?? 10_000);
     },
     [],
@@ -148,20 +199,17 @@ function ToastProvider({ children, placement }: ToastProviderProps) {
       value={{
         basic: (toast: NewToastArgument) => handleNewToast("basic", toast),
         success: (toast: NewToastArgument) => handleNewToast("success", toast),
-        warning: (toast: NewToastArgument) => handleNewToast("basic", toast),
+        warning: (toast: NewToastArgument) => handleNewToast("warning", toast),
         danger: (toast: NewToastArgument) => handleNewToast("danger", toast),
       }}
     >
       {children}
       <ClientOnly>
-        {createPortal(
-          <ToastContainer
-            placement={placement}
-            toasts={toasts}
-            onDismiss={handleDismissToast}
-          />,
-          document.body,
-        )}
+        <ToastContainer
+          placement={placement}
+          toasts={toasts}
+          onDismiss={handleDismissToast}
+        />
       </ClientOnly>
     </ToastContext.Provider>
   );

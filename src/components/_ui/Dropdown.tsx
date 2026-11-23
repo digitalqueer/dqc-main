@@ -1,35 +1,35 @@
 import {
+  type FloatingContext,
+  FloatingFocusManager,
+  FloatingList,
+  offset,
+  type ReferenceType,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useListItem,
+  useListNavigation,
+} from "@floating-ui/react";
+import {
+  type ComponentProps,
+  type CSSProperties,
   createContext,
+  type MouseEvent,
+  type MouseEventHandler,
+  type ReactNode,
+  type RefObject,
   useCallback,
   useContext,
   useId,
   useMemo,
   useRef,
   useState,
-  type ComponentProps,
-  type CSSProperties,
-  type MouseEvent,
-  type MouseEventHandler,
-  type ReactNode,
-  type RefObject,
 } from "react";
-import {
-  offset,
-  shift,
-  useDismiss,
-  useFloating,
-  useInteractions,
-  useListItem,
-  useListNavigation,
-  FloatingFocusManager,
-  FloatingList,
-  type FloatingContext,
-  type ReferenceType,
-  useClick,
-} from "@floating-ui/react";
+import { cn } from "@/lib/utils";
 import type { ButtonProps } from "./Button";
 import Button from "./Button";
-import { cn } from "@/lib/utils";
 import Link, { type LinkProps } from "./Link";
 
 type ContentDirection = "horizontal" | "vertical";
@@ -173,8 +173,10 @@ function Content({ children, className, ...props }: ContentProps) {
         <div
           {...props}
           id={id}
+          // z-20 keeps the menu above what comes after it. Without it, a later
+          // element that makes its own layer is drawn over the menu.
           className={cn(
-            "flex max-w-[clamp(0rem,calc(100dvw-(--spacing(8))),var(--container-lg))] flex-wrap gap-2 border bg-neutral-900 p-2 focus:outline-none md:gap-1",
+            "z-20 flex max-w-[clamp(0rem,calc(100dvw-(--spacing(8))),var(--container-lg))] flex-wrap gap-2 border bg-neutral-900 p-2 focus:outline-none md:gap-1",
             {
               "flex-row items-stretch": context.direction === "horizontal",
               "flex-col items-start": context.direction === "vertical",
@@ -189,7 +191,7 @@ function Content({ children, className, ...props }: ContentProps) {
         </div>
       </FloatingFocusManager>
     );
-  return <></>;
+  return null;
 }
 
 type ItemButtonProps = { as: "button" } & ButtonProps;
@@ -235,7 +237,7 @@ function Item({ as, children, className, ...props }: ItemProps) {
   );
 
   if (Comp === null) {
-    return <></>;
+    return null;
   }
 
   return (

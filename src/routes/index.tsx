@@ -1,3 +1,5 @@
+import { createFileRoute, Link as TanstackLink } from "@tanstack/react-router";
+import { ArrowRightIcon, SendIcon } from "lucide-react";
 import Definition from "@/components/_ui/Definition";
 import Dialog from "@/components/_ui/Dialog";
 import Link from "@/components/_ui/Link";
@@ -6,21 +8,27 @@ import Prose from "@/components/_ui/Prose";
 import SupportRibbon from "@/components/blocks/SupportRibbon";
 import ContactDialog from "@/components/dialogs/ContactDialog";
 import { getContactForm } from "@/server/functions/contact.functions";
-import { createFileRoute, Link as TanstackLink } from "@tanstack/react-router";
-import { ArrowRightIcon, SendIcon } from "lucide-react";
+import { listActiveProjects } from "@/server/functions/projects.functions";
 
 export const Route = createFileRoute("/")({
   component: App,
-  loader: () => getContactForm(),
+  loader: async () => {
+    const [contact_form, projects] = await Promise.all([
+      getContactForm(),
+      // The first three, in the order set on the admin Projects page.
+      listActiveProjects({ data: { limit: 3 } }),
+    ]);
+    return { ...contact_form, projects };
+  },
 });
 
 function App() {
-  const { turnstile_site_key } = Route.useLoaderData();
+  const { turnstile_site_key, projects } = Route.useLoaderData();
 
   return (
     <Main>
       <Prose>
-        <h2 className="normal-case! font-normal!">
+        <h2 className="font-normal! normal-case!">
           The Digital Queer Collective [DQC] is a community of 2SLGBTQIA+
           technologists and policy strategists dedicated to creating innovative
           software that celebrates inclusivity, creativity, and user diversity.
@@ -78,21 +86,39 @@ function App() {
           </TanstackLink>
         </h3>
 
-        <div className="flex justify-between gap-2 items-center mt-6 mb-2">
-          <h4 className="font-bold inline-block m-0!">
-            <TanstackLink
-              to="/projects/tfp"
-              className="no-underline rounded-none"
-            >
-              Trans Formations Data Archive
-            </TanstackLink>
-          </h4>
+        {projects.map((project) => (
+          <div
+            key={project.id}
+            className="mt-6 mb-2 flex items-center justify-between gap-2"
+          >
+            <h4 className="m-0! inline-block font-bold">
+              {project.hasPublishedPage ? (
+                <TanstackLink
+                  to="/projects/$slug"
+                  params={{ slug: project.id }}
+                  className="rounded-none no-underline"
+                >
+                  {project.name}
+                </TanstackLink>
+              ) : (
+                project.name
+              )}
+            </h4>
 
-          <Link to="/projects/tfp" className="m-0!">
-            <span>View Project</span>
-            <ArrowRightIcon strokeWidth={1.5} className="size-4" />
-          </Link>
-        </div>
+            <Link
+              to={project.hasPublishedPage ? "/projects/$slug" : "/projects"}
+              params={{ slug: project.id }}
+              className="m-0!"
+            >
+              <span>View Project</span>
+              <ArrowRightIcon
+                strokeWidth={1.5}
+                className="size-4"
+                aria-hidden
+              />
+            </Link>
+          </div>
+        ))}
       </Prose>
     </Main>
   );

@@ -1,45 +1,27 @@
-import Link from "@/components/_ui/Link";
+import { createFileRoute } from "@tanstack/react-router";
 import Main from "@/components/_ui/Main";
-import Prose from "@/components/_ui/Prose";
-import { getThoughtPostServerFn } from "@/server/thoughts/thoughts.functions";
-import { createFileRoute, notFound } from "@tanstack/react-router";
-import { ChevronRightIcon } from "lucide-react";
-import Markdown from "react-markdown";
+import { PostArticle, postHead } from "@/components/PostArticle";
+import { getPublishedPost } from "@/server/functions/posts.functions";
 
 export const Route = createFileRoute("/thoughts/$slug")({
+  staticData: { breadcrumb: Breadcrumb },
+  loader: ({ params }) =>
+    getPublishedPost({ data: { kind: "thought", slug: params.slug } }),
+  head: ({ loaderData }) => postHead(loaderData),
   component: RouteComponent,
-  async loader({ params }) {
-    const data = await getThoughtPostServerFn({ data: { slug: params.slug } });
-    if (!data) throw notFound();
-    return data;
-  },
 });
 
+// Annotated: its type can't be inferred from Route, whose options include it.
+function Breadcrumb(): string {
+  return Route.useLoaderData().post.title;
+}
+
 function RouteComponent() {
-  const params = Route.useParams();
-  const { data, content } = Route.useLoaderData();
+  const data = Route.useLoaderData();
 
   return (
     <Main>
-      <div className="-ml-2 flex items-center gap-2">
-        <Link size="sm" to="/thoughts">
-          <span>Thoughts</span>
-        </Link>
-        <ChevronRightIcon strokeWidth={1.5} size={16} />
-        <Link size="sm" to="/thoughts/$slug" params={params} disabled>
-          <span>{data.title}</span>
-        </Link>
-      </div>
-      <Prose>
-        <h2 className="mb-2">{data.title}</h2>
-        <p className="text-sm">Written by {data.author}</p>
-        <Markdown>{content}</Markdown>
-        {data.publishedAt && (
-          <p className="text-neutral-400">
-            Published at {data.publishedAt?.toLocaleDateString()}
-          </p>
-        )}
-      </Prose>
+      <PostArticle {...data} />
     </Main>
   );
 }

@@ -1,62 +1,123 @@
+import { createFileRoute, Link as TanstackLink } from "@tanstack/react-router";
+import { ArrowRightIcon, CodeIcon, ExternalLinkIcon } from "lucide-react";
+import { Fragment } from "react";
+import { buttonVariants } from "@/components/_ui/Button";
 import Link from "@/components/_ui/Link";
 import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
-import { createFileRoute, Link as TanstackLink } from "@tanstack/react-router";
-import { ArrowRightIcon, ExternalLinkIcon } from "lucide-react";
+import { projectDates } from "@/lib/projects";
+import { pageMeta } from "@/lib/share";
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/_ui/Button";
+import { listPublicProjects } from "@/server/functions/projects.functions";
 
 export const Route = createFileRoute("/projects/")({
+  loader: () => listPublicProjects(),
+  head: () => ({
+    meta: pageMeta({ title: "Projects" }),
+  }),
   component: RouteComponent,
 });
 
+type PublicProject = Awaited<ReturnType<typeof listPublicProjects>>[number];
+
+const EXTERNAL_LINK_CLASSES = cn(
+  "flex items-center justify-between gap-2 text-sm",
+  buttonVariants(),
+);
+
+/** Paragraphs from a plain-text description (blank lines separate them). */
+function Description({ text }: { text: string }) {
+  return text
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+    .map((paragraph, index) => (
+      // biome-ignore lint/suspicious/noArrayIndexKey: paragraphs of a fixed text, never reordered
+      <p key={index}>{paragraph}</p>
+    ));
+}
+
+function ProjectSummary({ project }: { project: PublicProject }) {
+  return (
+    <section>
+      <h3>
+        {project.hasPublishedPage ? (
+          <TanstackLink
+            className="font-bold no-underline"
+            to="/projects/$slug"
+            params={{ slug: project.id }}
+          >
+            {project.name}
+          </TanstackLink>
+        ) : (
+          project.name
+        )}
+      </h3>
+      {project.description && <Description text={project.description} />}
+      <p className="text-sm">{projectDates(project)}</p>
+      <div className="-ml-3 flex flex-wrap items-center justify-between gap-2">
+        {project.hasPublishedPage && (
+          <Link to="/projects/$slug" params={{ slug: project.id }}>
+            <span>View Project</span>
+            <ArrowRightIcon strokeWidth={1.5} className="size-4" aria-hidden />
+          </Link>
+        )}
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          {project.websiteLink && (
+            <a
+              href={project.websiteLink}
+              target="_blank"
+              rel="noreferrer"
+              className={EXTERNAL_LINK_CLASSES}
+            >
+              <span>View Website</span>
+              <ExternalLinkIcon
+                strokeWidth={1.5}
+                className="size-4"
+                aria-hidden
+              />
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          )}
+          {project.sourceLink && (
+            <a
+              href={project.sourceLink}
+              target="_blank"
+              rel="noreferrer"
+              className={EXTERNAL_LINK_CLASSES}
+            >
+              <span>View Source</span>
+              <CodeIcon strokeWidth={1.5} className="size-4" aria-hidden />
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function RouteComponent() {
+  const projects = Route.useLoaderData();
+  const active = projects.filter(({ isActive }) => isActive);
+  const past = projects.filter(({ isActive }) => !isActive);
+
   return (
     <Main>
       <Prose>
         <h2>Projects</h2>
-        <h3>
-          <TanstackLink className="no-underline font-bold" to="/projects/tfp">
-            Trans Formations Data Archive
-          </TanstackLink>
-        </h3>
-        <p>
-          The collective's founders started their queer-advocacy work with
-          another organization, the{" "}
-          <a
-            href="https://transformationsproject.org"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Trans Formations Project (TFP)
-          </a>
-          . TFP focused its efforts on tracking anti-queer legislation efforts
-          across the United States. 9 months into President Donald Trump's
-          second administration, the organization ceased operations in response
-          to growing hositily and concerns for the safety of its members. Upon
-          TFP's disbandment, the founders of DQC assisted with archiving the
-          data and records gathered by TFP. Much of TFP's data can be found here
-          and is welcome to be used for any aligned endeavors.
-        </p>
-        <p className="text-sm">Spring 2026</p>
-        <div className="flex items-center justify-between gap-2 -ml-3">
-          <Link to="/projects/tfp">
-            <span>View Project</span>
-            <ArrowRightIcon strokeWidth={1.5} className="size-4" />
-          </Link>
-          <a
-            href="https://transformationsproject.org"
-            target="_blank"
-            rel="noreferrer"
-            className={cn(
-              "flex items-center justify-between gap-2 text-sm",
-              buttonVariants(),
-            )}
-          >
-            <span>View Org Site</span>
-            <ExternalLinkIcon strokeWidth={1.5} className="size-4" />
-          </a>
-        </div>
+        {projects.length === 0 && <p className="italic">Nothing here yet.</p>}
+        {active.map((project) => (
+          <ProjectSummary key={project.id} project={project} />
+        ))}
+        {past.length > 0 && (
+          <Fragment>
+            <h2>Past Projects</h2>
+            {past.map((project) => (
+              <ProjectSummary key={project.id} project={project} />
+            ))}
+          </Fragment>
+        )}
       </Prose>
     </Main>
   );

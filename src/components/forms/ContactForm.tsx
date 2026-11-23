@@ -87,18 +87,17 @@ export function ContactForm({
       }}
     >
       <div className="flex gap-4">
-        <form.Field
-          name="firstName"
-          children={(field) => (
+        <form.Field name="firstName">
+          {(field) => (
             <fieldset className="w-full">
               <label
-                className="block mb-0.5 ml-0.5"
+                className="mb-0.5 ml-0.5 block"
                 htmlFor={`${id}__${field.name}`}
               >
                 First Name
               </label>
               <input
-                className="w-full border focus:border-opacity-50 focus:outline-white focus:outline-1 outline-offset-2 px-2 py-1"
+                className="focus:border-opacity-50 w-full border px-2 py-1 outline-offset-2 focus:outline-1 focus:outline-white"
                 autoComplete="given-name"
                 placeholder="Jane"
                 id={`${id}__${field.name}`}
@@ -109,19 +108,18 @@ export function ContactForm({
               <FieldInfo field={field} />
             </fieldset>
           )}
-        />
-        <form.Field
-          name="lastName"
-          children={(field) => (
+        </form.Field>
+        <form.Field name="lastName">
+          {(field) => (
             <fieldset className="w-full">
               <label
-                className="block mb-0.5 ml-0.5"
+                className="mb-0.5 ml-0.5 block"
                 htmlFor={`${id}__${field.name}`}
               >
                 Last Name
               </label>
               <input
-                className="w-full border focus:border-opacity-50 focus:outline-white focus:outline-1 outline-offset-2 px-2 py-1"
+                className="focus:border-opacity-50 w-full border px-2 py-1 outline-offset-2 focus:outline-1 focus:outline-white"
                 autoComplete="family-name"
                 placeholder="Doe"
                 id={`${id}__${field.name}`}
@@ -132,14 +130,13 @@ export function ContactForm({
               <FieldInfo field={field} />
             </fieldset>
           )}
-        />
+        </form.Field>
       </div>
-      <form.Field
-        name="email"
-        children={(field) => (
+      <form.Field name="email">
+        {(field) => (
           <fieldset className="w-full">
             <label
-              className="block mb-0.5 ml-0.5"
+              className="mb-0.5 ml-0.5 block"
               htmlFor={`${id}__${field.name}`}
             >
               Email
@@ -148,7 +145,7 @@ export function ContactForm({
               aria-invalid={
                 field.state.meta.isTouched && !field.state.meta.isValid
               }
-              className="w-full aria-[invalid=true]:border-rose-300 border focus:border-opacity-50 focus:outline-white focus:outline-1 outline-offset-2 px-2 py-1"
+              className="focus:border-opacity-50 w-full border px-2 py-1 outline-offset-2 focus:outline-1 focus:outline-white aria-[invalid=true]:border-rose-300"
               autoComplete="email"
               type="email"
               placeholder="jane.doe@email.com"
@@ -160,19 +157,18 @@ export function ContactForm({
             <FieldInfo field={field} />
           </fieldset>
         )}
-      />
-      <form.Field
-        name="comment"
-        children={(field) => (
+      </form.Field>
+      <form.Field name="comment">
+        {(field) => (
           <fieldset className="w-full">
             <label
-              className="block mb-0.5 ml-0.5"
+              className="mb-0.5 ml-0.5 block"
               htmlFor={`${id}__${field.name}`}
             >
               Question/Comment
             </label>
             <textarea
-              className="w-full border focus:border-opacity-50 focus:outline-white focus:outline-1 outline-offset-2 px-2 py-1"
+              className="focus:border-opacity-50 w-full border px-2 py-1 outline-offset-2 focus:outline-1 focus:outline-white"
               autoComplete="off"
               id={`${id}__${field.name}`}
               value={field.state.value}
@@ -182,15 +178,14 @@ export function ContactForm({
             <FieldInfo field={field} />
           </fieldset>
         )}
-      />
-      <form.Field
-        name="communicationsConsent"
-        children={(field) => (
+      </form.Field>
+      <form.Field name="communicationsConsent">
+        {(field) => (
           <fieldset className="w-full">
             <div className="flex items-start gap-2">
               <input
                 type="checkbox"
-                className="size-5 mt-0.5 border accent-white rounded-none focus:outline-white outline-offset-2 focus:outline-1"
+                className="mt-0.5 size-5 rounded-none border accent-white outline-offset-2 focus:outline-1 focus:outline-white"
                 autoComplete="off"
                 id={`${id}__${field.name}`}
                 checked={field.state.value}
@@ -204,7 +199,7 @@ export function ContactForm({
             <FieldInfo field={field} />
           </fieldset>
         )}
-      />
+      </form.Field>
       {turnstileSiteKey ? (
         <Turnstile
           ref={turnstile_ref}
@@ -214,7 +209,7 @@ export function ContactForm({
           on_token={set_token}
         />
       ) : (
-        <p className="mt-2 text-neutral-400 text-sm">
+        <p className="mt-2 text-sm text-neutral-400">
           The contact form isn't available right now. Please try again later.
         </p>
       )}
