@@ -4,10 +4,13 @@ import {
 } from "@/schemas/contactRequest.schema";
 import { validateTurnstileToken } from "../turnstile/turnstile.server";
 import { Prettify } from "@/lib/utils";
-import { db } from "@/db/database";
-import { contactRequestTable, SelectableContactRequest } from "@/db/schema";
+import { db } from "@/server/database/index.server";
+import {
+  contactRequestTable,
+  type SelectableContactRequest,
+} from "@/server/database/schema.server";
 import { Resend } from "resend";
-import { serverEnv } from "@/env";
+import { getServerEnv } from "@/server/env.server";
 
 type ContactRequestErrorCode =
   | "invalid-token"
@@ -43,7 +46,7 @@ export async function createContactRequest(
   }
   let communicationsId: string = "";
   if (contactRequest.communicationsConsent) {
-    const resend = new Resend(serverEnv.RESEND_SECRET_KEY);
+    const resend = new Resend(getServerEnv().resend.secretKey);
     const resendContactResponse = await resend.contacts.create({
       email: contactRequest.email,
       firstName: contactRequest.firstName,

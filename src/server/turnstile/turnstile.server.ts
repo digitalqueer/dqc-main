@@ -1,4 +1,4 @@
-import { serverEnv } from "@/env";
+import { getServerEnv } from "@/server/env.server";
 import { Prettify } from "@/lib/utils";
 import { CONTACT_TURNSTILE_ACTION } from "@/schemas/contactRequest.schema";
 
@@ -42,7 +42,7 @@ export async function validateTurnstileToken(
 ): Promise<SiteVerifyResponse> {
   try {
     const body = {
-      secret: serverEnv.CLOUDFLARE_SECRET_KEY,
+      secret: getServerEnv().turnstile.secretKey,
       response: token,
     };
     const validationResponse = await fetch(

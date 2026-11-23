@@ -9,42 +9,35 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ThoughtsIndexRouteImport } from './routes/thoughts/index'
-import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
-import { Route as ThoughtsSlugRouteImport } from './routes/thoughts/$slug'
-import { Route as ProjectsTfpRouteImport } from './routes/projects/tfp'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
+import { Route as ProjectsTfpRouteImport } from './routes/projects/tfp'
+import { Route as ThoughtsIndexRouteImport } from './routes/thoughts/index'
+import { Route as ThoughtsSlugRouteImport } from './routes/thoughts/$slug'
+import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ThoughtsIndexRoute = ThoughtsIndexRouteImport.update({
-  id: '/thoughts/',
-  path: '/thoughts/',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
-  id: '/projects/',
-  path: '/projects/',
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ThoughtsSlugRoute = ThoughtsSlugRouteImport.update({
-  id: '/thoughts/$slug',
-  path: '/thoughts/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectsTfpRoute = ProjectsTfpRouteImport.update({
-  id: '/projects/tfp',
-  path: '/projects/tfp',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
@@ -52,84 +45,131 @@ const ApiHealthRoute = ApiHealthRouteImport.update({
   path: '/api/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsTfpRoute = ProjectsTfpRouteImport.update({
+  id: '/projects/tfp',
+  path: '/projects/tfp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ThoughtsIndexRoute = ThoughtsIndexRouteImport.update({
+  id: '/thoughts/',
+  path: '/thoughts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ThoughtsSlugRoute = ThoughtsSlugRouteImport.update({
+  id: '/thoughts/$slug',
+  path: '/thoughts/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardIndexRoute =
+  AuthenticatedDashboardIndexRouteImport.update({
+    id: '/dashboard/',
+    path: '/dashboard/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
   '/api/health': typeof ApiHealthRoute
   '/projects/tfp': typeof ProjectsTfpRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/thoughts/': typeof ThoughtsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
   '/api/health': typeof ApiHealthRoute
   '/projects/tfp': typeof ProjectsTfpRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
   '/projects': typeof ProjectsIndexRoute
   '/thoughts': typeof ThoughtsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
   '/api/health': typeof ApiHealthRoute
   '/projects/tfp': typeof ProjectsTfpRoute
   '/thoughts/$slug': typeof ThoughtsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/thoughts/': typeof ThoughtsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/login'
     | '/api/health'
     | '/projects/tfp'
     | '/thoughts/$slug'
     | '/projects/'
     | '/thoughts/'
+    | '/api/auth/$'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/login'
     | '/api/health'
     | '/projects/tfp'
     | '/thoughts/$slug'
     | '/projects'
     | '/thoughts'
+    | '/api/auth/$'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
+    | '/login'
     | '/api/health'
     | '/projects/tfp'
     | '/thoughts/$slug'
     | '/projects/'
     | '/thoughts/'
+    | '/api/auth/$'
+    | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  LoginRoute: typeof LoginRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ProjectsTfpRoute: typeof ProjectsTfpRoute
   ThoughtsSlugRoute: typeof ThoughtsSlugRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
   ThoughtsIndexRoute: typeof ThoughtsIndexRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -137,32 +177,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/thoughts/': {
-      id: '/thoughts/'
-      path: '/thoughts'
-      fullPath: '/thoughts/'
-      preLoaderRoute: typeof ThoughtsIndexRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/projects/': {
-      id: '/projects/'
-      path: '/projects'
-      fullPath: '/projects/'
-      preLoaderRoute: typeof ProjectsIndexRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/thoughts/$slug': {
-      id: '/thoughts/$slug'
-      path: '/thoughts/$slug'
-      fullPath: '/thoughts/$slug'
-      preLoaderRoute: typeof ThoughtsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/projects/tfp': {
-      id: '/projects/tfp'
-      path: '/projects/tfp'
-      fullPath: '/projects/tfp'
-      preLoaderRoute: typeof ProjectsTfpRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/health': {
@@ -172,27 +205,85 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/': {
+      id: '/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/tfp': {
+      id: '/projects/tfp'
+      path: '/projects/tfp'
+      fullPath: '/projects/tfp'
+      preLoaderRoute: typeof ProjectsTfpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/thoughts/': {
+      id: '/thoughts/'
+      path: '/thoughts'
+      fullPath: '/thoughts/'
+      preLoaderRoute: typeof ThoughtsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/thoughts/$slug': {
+      id: '/thoughts/$slug'
+      path: '/thoughts/$slug'
+      fullPath: '/thoughts/$slug'
+      preLoaderRoute: typeof ThoughtsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard/': {
+      id: '/_authenticated/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
+  LoginRoute: LoginRoute,
   ApiHealthRoute: ApiHealthRoute,
   ProjectsTfpRoute: ProjectsTfpRoute,
   ThoughtsSlugRoute: ThoughtsSlugRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
   ThoughtsIndexRoute: ThoughtsIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

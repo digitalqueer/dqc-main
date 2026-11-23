@@ -5,14 +5,18 @@ import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
 import SupportRibbon from "@/components/blocks/SupportRibbon";
 import ContactDialog from "@/components/dialogs/ContactDialog";
+import { getContactFormServerFn } from "@/server/contact/contact.functions";
 import { createFileRoute, Link as TanstackLink } from "@tanstack/react-router";
 import { ArrowRightIcon, SendIcon } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: App,
+  loader: () => getContactFormServerFn(),
 });
 
 function App() {
+  const { turnstileSiteKey } = Route.useLoaderData();
+
   return (
     <Main>
       <Prose>
@@ -56,7 +60,7 @@ function App() {
         </p>
 
         <div className="flex flex-wrap gap-2">
-          <ContactDialog>
+          <ContactDialog turnstileSiteKey={turnstileSiteKey}>
             <Dialog.Action command="show-modal" className="text-white">
               <SendIcon strokeWidth={1.5} size={16} />
               <span>Looking to Connect?</span>

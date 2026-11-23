@@ -3,9 +3,7 @@ import {
   MenuIcon,
   RssIcon,
   UsersIcon,
-  WandIcon,
 } from "lucide-react";
-import Button from "./Button";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 import Dropdown from "./Dropdown";
