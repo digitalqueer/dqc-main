@@ -13,9 +13,12 @@ export default function ErrorView({ error, reset }: ErrorComponentProps) {
 
   return (
     <Main>
-      <section role="alert" className="flex w-full flex-col items-center gap-4 text-center">
+      <section
+        role="alert"
+        className="flex w-full flex-col items-center gap-4 text-center"
+      >
         <h2 className="text-2xl font-semibold">Something went wrong</h2>
-        <p className="text-neutral-300 break-words">
+        <p className="break-words text-neutral-300">
           {error instanceof Error ? error.message : String(error)}
         </p>
         <div className="flex flex-wrap justify-center gap-2">

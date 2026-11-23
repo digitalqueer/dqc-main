@@ -1,35 +1,35 @@
 import {
+  type FloatingContext,
+  FloatingFocusManager,
+  FloatingList,
+  offset,
+  type ReferenceType,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useListItem,
+  useListNavigation,
+} from "@floating-ui/react";
+import {
+  type ComponentProps,
+  type CSSProperties,
   createContext,
+  type MouseEvent,
+  type MouseEventHandler,
+  type ReactNode,
+  type RefObject,
   useCallback,
   useContext,
   useId,
   useMemo,
   useRef,
   useState,
-  type ComponentProps,
-  type CSSProperties,
-  type MouseEvent,
-  type MouseEventHandler,
-  type ReactNode,
-  type RefObject,
 } from "react";
-import {
-  offset,
-  shift,
-  useDismiss,
-  useFloating,
-  useInteractions,
-  useListItem,
-  useListNavigation,
-  FloatingFocusManager,
-  FloatingList,
-  type FloatingContext,
-  type ReferenceType,
-  useClick,
-} from "@floating-ui/react";
+import { cn } from "@/lib/utils";
 import type { ButtonProps } from "./Button";
 import Button from "./Button";
-import { cn } from "@/lib/utils";
 import Link, { type LinkProps } from "./Link";
 
 type ContentDirection = "horizontal" | "vertical";
@@ -191,7 +191,7 @@ function Content({ children, className, ...props }: ContentProps) {
         </div>
       </FloatingFocusManager>
     );
-  return <></>;
+  return null;
 }
 
 type ItemButtonProps = { as: "button" } & ButtonProps;
@@ -237,7 +237,7 @@ function Item({ as, children, className, ...props }: ItemProps) {
   );
 
   if (Comp === null) {
-    return <></>;
+    return null;
   }
 
   return (

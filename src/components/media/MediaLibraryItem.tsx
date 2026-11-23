@@ -32,7 +32,7 @@ export function MediaLibraryItem({
         disabled={!!unavailable_label}
         aria-pressed={is_selected}
         className={cn(
-          "group relative block aspect-square w-full overflow-hidden border border-neutral-700 bg-neutral-800 cursor-pointer focus:outline focus:outline-offset-2 focus:outline-white",
+          "group relative block aspect-square w-full cursor-pointer overflow-hidden border border-neutral-700 bg-neutral-800 focus:outline focus:outline-offset-2 focus:outline-white",
           "disabled:cursor-not-allowed disabled:opacity-50",
           is_selected && "outline-2 outline-offset-2 outline-white",
         )}
@@ -46,7 +46,7 @@ export function MediaLibraryItem({
             className="h-full w-full object-cover transition-transform motion-safe:group-hover:scale-105"
           />
         ) : (
-          <span className="flex h-full items-center justify-center p-2 text-sm opacity-80 break-all">
+          <span className="flex h-full items-center justify-center p-2 text-sm break-all opacity-80">
             {item.originalName}
           </span>
         )}

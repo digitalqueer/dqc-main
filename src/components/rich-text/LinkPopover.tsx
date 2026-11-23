@@ -1,8 +1,4 @@
-import {
-  $createLinkNode,
-  $isLinkNode,
-  $toggleLink,
-} from "@lexical/link";
+import { $createLinkNode, $isLinkNode, $toggleLink } from "@lexical/link";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $findMatchingParent } from "@lexical/utils";
 import {
@@ -14,7 +10,14 @@ import {
   KEY_MODIFIER_COMMAND,
 } from "lexical";
 import { Link2Icon, Link2OffIcon } from "lucide-react";
-import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
+import {
+  type FormEvent,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { isSafeUrl } from "@/lib/rich-text";
 import { cn } from "@/lib/utils";
 import Button from "../_ui/Button";
@@ -207,10 +210,7 @@ export function LinkPopover({
               className={INPUT_CLASSES}
             />
             {error && (
-              <p
-                id={error_id}
-                className="text-sm italic text-rose-300"
-              >
+              <p id={error_id} className="text-sm text-rose-300 italic">
                 {error}
               </p>
             )}

@@ -39,7 +39,12 @@ export const tagList = (max_tags: number, max_length: number) =>
       ...new Set(
         value
           .split(",")
-          .map((tag) => tag.trim().replace(/^#+\s*/, "").toLowerCase())
+          .map((tag) =>
+            tag
+              .trim()
+              .replace(/^#+\s*/, "")
+              .toLowerCase(),
+          )
           .filter(Boolean),
       ),
     ])

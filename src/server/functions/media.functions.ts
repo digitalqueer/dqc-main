@@ -144,7 +144,9 @@ export const completeMediaUpload = createServerFn({ method: "POST" })
     if (!stored) {
       await context.media.deleteMedia(item.id);
       setResponseStatus(409);
-      throw new Error("The file never reached storage. Try uploading it again.");
+      throw new Error(
+        "The file never reached storage. Try uploading it again.",
+      );
     }
     const stored_type = stored.contentType.split(";")[0].trim().toLowerCase();
     if (
@@ -175,7 +177,7 @@ export const cancelMediaUpload = createServerFn({ method: "POST" })
   .validator(mediaIdSchema)
   .handler(async ({ context, data }) => {
     const item = await context.media.getMedia(data.id);
-    if (!item || item.status !== "pending") return { success: true };
+    if (item?.status !== "pending") return { success: true };
     const { storage } = getMediaStorage();
     try {
       // A partial PUT never creates an object, but a finished one might exist.

@@ -59,7 +59,9 @@ export function ImagePicker({ disabled, className }: ImagePickerProps) {
         size="icon"
         className={className}
         aria-label="Insert image"
-        title={activity_label ? `Insert image (${activity_label})` : "Insert image"}
+        title={
+          activity_label ? `Insert image (${activity_label})` : "Insert image"
+        }
         aria-haspopup="dialog"
         disabled={disabled}
         onClick={() => set_is_open(true)}
@@ -68,7 +70,7 @@ export function ImagePicker({ disabled, className }: ImagePickerProps) {
       </Button>
       <Dialog.Root open={is_open} onOpenChange={set_is_open}>
         <Dialog.Content className="max-w-3xl gap-4">
-          <div className="-mx-2 px-2 pb-2 pr-12 border-b flex flex-wrap items-end justify-between gap-2">
+          <div className="-mx-2 flex flex-wrap items-end justify-between gap-2 border-b px-2 pr-12 pb-2">
             <div>
               <h2 className="text-2xl font-bold">Insert Image</h2>
               <p className="text-sm opacity-80">
@@ -97,7 +99,7 @@ export function ImagePicker({ disabled, className }: ImagePickerProps) {
             <div
               id={uploader_id}
               hidden={!is_uploader_shown}
-              className="px-2 pb-4 border-b border-neutral-700"
+              className="border-b border-neutral-700 px-2 pb-4"
             >
               <MediaUploader
                 disabled={!can_upload}
@@ -114,7 +116,9 @@ export function ImagePicker({ disabled, className }: ImagePickerProps) {
               <MediaPickerLibrary
                 on_pick={insert}
                 action="Insert"
-                on_loaded={(library) => set_can_upload(library.setup.can_upload)}
+                on_loaded={(library) =>
+                  set_can_upload(library.setup.can_upload)
+                }
                 reload={reload}
               />
             )}

@@ -41,7 +41,7 @@ function RouteComponent() {
             <section key={thought.id}>
               <h3>
                 <TanstackLink
-                  className="no-underline font-bold"
+                  className="font-bold no-underline"
                   to="/thoughts/$slug"
                   params={{ slug: thought.slug }}
                 >
@@ -56,10 +56,14 @@ function RouteComponent() {
                   className="-ml-3"
                 >
                   <span>View Post</span>
-                  <ArrowRightIcon strokeWidth={1.5} className="size-4" aria-hidden />
+                  <ArrowRightIcon
+                    strokeWidth={1.5}
+                    className="size-4"
+                    aria-hidden
+                  />
                 </Link>
                 {thought.publishedAt && (
-                  <p className="text-sm m-0!">
+                  <p className="m-0! text-sm">
                     <PublishedDate date={thought.publishedAt} />
                   </p>
                 )}

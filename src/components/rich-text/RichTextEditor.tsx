@@ -28,9 +28,9 @@ import {
   MediaViewStoreProvider,
   useCreateMediaViewStore,
 } from "./mediaViewStore";
+import { RichTextToolbar } from "./RichTextToolbar";
 import { RICH_TEXT_CLASSES, RICH_TEXT_PROSE } from "./richTextClasses";
 import { RICH_TEXT_NODES, RICH_TEXT_TRANSFORMERS } from "./richTextNodes";
-import { RichTextToolbar } from "./RichTextToolbar";
 
 const THEME: EditorThemeClasses = {
   text: {
@@ -138,7 +138,7 @@ export function RichTextEditor({
         <ImageActionsProvider>
           <div
             className={cn(
-              "flex flex-col border border-neutral-700 focus-within:border-white transition-colors",
+              "flex flex-col border border-neutral-700 transition-colors focus-within:border-white",
               className,
             )}
           >
@@ -156,7 +156,7 @@ export function RichTextEditor({
                     placeholder={
                       <div
                         aria-hidden
-                        className="pointer-events-none absolute top-4 left-4 select-none opacity-60"
+                        className="pointer-events-none absolute top-4 left-4 opacity-60 select-none"
                       >
                         {placeholder}
                       </div>

@@ -20,12 +20,12 @@ export const auth = betterAuth({
       config: [
         {
           providerId: "dqc",
-          clientId: process.env.DQC_CLIENT_ID!,
-          clientSecret: process.env.DQC_CLIENT_SECRET!,
-          authorizationUrl: process.env.DQC_AUTHORIZE_URL!,
-          endSessionEndpoint: process.env.DQC_END_SESSION_URL!,
-          tokenUrl: process.env.DQC_TOKEN_URL!,
-          userInfoUrl: process.env.DQC_USER_INFO_URL!,
+          clientId: process.env.DQC_CLIENT_ID ?? "",
+          clientSecret: process.env.DQC_CLIENT_SECRET ?? "",
+          authorizationUrl: process.env.DQC_AUTHORIZE_URL ?? "",
+          endSessionEndpoint: process.env.DQC_END_SESSION_URL ?? "",
+          tokenUrl: process.env.DQC_TOKEN_URL ?? "",
+          userInfoUrl: process.env.DQC_USER_INFO_URL ?? "",
         },
       ],
     }),

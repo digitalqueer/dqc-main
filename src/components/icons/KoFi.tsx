@@ -1,8 +1,10 @@
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 
 export default function KoFiIcon(props: ComponentProps<"svg">) {
   return (
     <svg
+      // Decorative: it's always next to text that names the link.
+      aria-hidden="true"
       {...props}
       width="20"
       height="20"

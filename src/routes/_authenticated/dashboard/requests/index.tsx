@@ -1,6 +1,5 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
-import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Divider from "@/components/_ui/Divider";
 import Link from "@/components/_ui/Link";
 import Main from "@/components/_ui/Main";
@@ -13,6 +12,7 @@ import { contactRequestsSearchSchema } from "@/lib/contact";
 import { listContactRequests } from "@/server/functions/contact.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
+  staticData: { breadcrumb: "Contact Requests" },
   validateSearch: contactRequestsSearchSchema,
   // Keeps "?page=1" out of URLs.
   search: { middlewares: [stripSearchParams({ page: 1 })] },
@@ -44,9 +44,6 @@ function RouteComponent() {
 
   return (
     <Main>
-      <BreadcrumbNav current_page_label="Contact Requests">
-        <BreadcrumbItem to="/dashboard">Dashboard</BreadcrumbItem>
-      </BreadcrumbNav>
       {setup.missing_turnstile.length > 0 && (
         <p className="border border-yellow-200 bg-yellow-950/40 p-3 text-sm">
           The contact form is off: Turnstile isn't configured. Set{" "}
@@ -66,7 +63,7 @@ function RouteComponent() {
         {unread.length > 0 ? (
           render_list(unread)
         ) : (
-          <p className="italic text-neutral-300">
+          <p className="text-neutral-300 italic">
             No new messages. Messages sent from the home page's contact form
             show up here.
           </p>
@@ -84,7 +81,7 @@ function RouteComponent() {
         {read.items.length > 0 ? (
           render_list(read.items)
         ) : (
-          <p className="italic text-neutral-300">Nothing marked read yet.</p>
+          <p className="text-neutral-300 italic">Nothing marked read yet.</p>
         )}
         {read.page_count > 1 && (
           <nav

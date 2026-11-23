@@ -1,10 +1,10 @@
-import { cn } from "@/lib/utils";
 import { Avatar as BaseAvatar } from "@base-ui-components/react/avatar";
 import { cva, type VariantProps } from "class-variance-authority";
-import { useMemo, type ComponentProps } from "react";
+import { type ComponentProps, useMemo } from "react";
+import { cn } from "@/lib/utils";
 
 const AvatarVariants = cva(
-  "inline-flex select-none items-center justify-center overflow-hidden bg-gray-100 align-middle font-medium text-base text-neutral-700",
+  "inline-flex items-center justify-center overflow-hidden bg-gray-100 align-middle text-base font-medium text-neutral-700 select-none",
   {
     variants: {
       size: {

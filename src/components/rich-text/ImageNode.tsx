@@ -19,7 +19,10 @@ import {
 import { type ReactNode, useEffect } from "react";
 import { RICH_TEXT_IMAGE_TYPE } from "@/lib/rich-text";
 import { ImageBlock } from "./ImageBlock";
-import { INSERT_IMAGE_COMMAND, SET_IMAGE_CAPTION_COMMAND } from "./imageCommands";
+import {
+  INSERT_IMAGE_COMMAND,
+  SET_IMAGE_CAPTION_COMMAND,
+} from "./imageCommands";
 
 export type SerializedImageNode = Spread<
   { mediaId: string; caption?: string },
@@ -106,7 +109,10 @@ export class ImageNode extends DecoratorNode<ReactNode> {
   }
 }
 
-export function $createImageNode(media_id: string, caption: string | null = null) {
+export function $createImageNode(
+  media_id: string,
+  caption: string | null = null,
+) {
   return $applyNodeReplacement(new ImageNode(media_id, caption));
 }
 

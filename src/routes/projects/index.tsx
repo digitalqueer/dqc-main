@@ -31,7 +31,10 @@ function Description({ text }: { text: string }) {
     .split(/\n\s*\n/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean)
-    .map((paragraph, index) => <p key={index}>{paragraph}</p>);
+    .map((paragraph, index) => (
+      // biome-ignore lint/suspicious/noArrayIndexKey: paragraphs of a fixed text, never reordered
+      <p key={index}>{paragraph}</p>
+    ));
 }
 
 function ProjectSummary({ project }: { project: PublicProject }) {
@@ -40,7 +43,7 @@ function ProjectSummary({ project }: { project: PublicProject }) {
       <h3>
         {project.hasPublishedPage ? (
           <TanstackLink
-            className="no-underline font-bold"
+            className="font-bold no-underline"
             to="/projects/$slug"
             params={{ slug: project.id }}
           >
@@ -52,14 +55,14 @@ function ProjectSummary({ project }: { project: PublicProject }) {
       </h3>
       {project.description && <Description text={project.description} />}
       <p className="text-sm">{projectDates(project)}</p>
-      <div className="flex flex-wrap items-center justify-between gap-2 -ml-3">
+      <div className="-ml-3 flex flex-wrap items-center justify-between gap-2">
         {project.hasPublishedPage && (
           <Link to="/projects/$slug" params={{ slug: project.id }}>
             <span>View Project</span>
             <ArrowRightIcon strokeWidth={1.5} className="size-4" aria-hidden />
           </Link>
         )}
-        <div className="flex flex-wrap items-center gap-2 ml-auto">
+        <div className="ml-auto flex flex-wrap items-center gap-2">
           {project.websiteLink && (
             <a
               href={project.websiteLink}
@@ -68,7 +71,11 @@ function ProjectSummary({ project }: { project: PublicProject }) {
               className={EXTERNAL_LINK_CLASSES}
             >
               <span>View Website</span>
-              <ExternalLinkIcon strokeWidth={1.5} className="size-4" aria-hidden />
+              <ExternalLinkIcon
+                strokeWidth={1.5}
+                className="size-4"
+                aria-hidden
+              />
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
           )}

@@ -66,7 +66,9 @@ function CaptionForm({
     own === null ? "library" : own.trim() ? "custom" : "none",
   );
   // Starts from the library caption, so it's easy to adapt for this page.
-  const [text, set_text] = useState(own?.trim() ? own : (target.library_caption ?? ""));
+  const [text, set_text] = useState(
+    own?.trim() ? own : (target.library_caption ?? ""),
+  );
   const [error, set_error] = useState<string | null>(null);
   const text_ref = useRef<HTMLTextAreaElement>(null);
   const name = useId();
@@ -93,16 +95,16 @@ function CaptionForm({
 
   return (
     <form onSubmit={save} className="flex flex-col gap-4">
-      <div className="-mx-2 px-2 pb-2 pr-12 border-b">
+      <div className="-mx-2 border-b px-2 pr-12 pb-2">
         <h2 className="text-2xl font-bold">Caption on This Page</h2>
         <p className="text-sm opacity-80">
           For <span className="break-all">{target.name}</span> here only. Its
           library caption stays as it is.
         </p>
       </div>
-      <fieldset className="px-2 flex flex-col gap-3">
+      <fieldset className="flex flex-col gap-3 px-2">
         <legend className="sr-only">Caption</legend>
-        <label className="flex items-start gap-2 cursor-pointer">
+        <label className="flex cursor-pointer items-start gap-2">
           <input
             type="radio"
             name={name}
@@ -120,7 +122,7 @@ function CaptionForm({
           </span>
         </label>
         <div className="flex flex-col gap-1">
-          <label className="flex items-start gap-2 cursor-pointer">
+          <label className="flex cursor-pointer items-start gap-2">
             <input
               type="radio"
               name={name}
@@ -156,7 +158,7 @@ function CaptionForm({
             </p>
           )}
         </div>
-        <label className="flex items-start gap-2 cursor-pointer">
+        <label className="flex cursor-pointer items-start gap-2">
           <input
             type="radio"
             name={name}
@@ -167,7 +169,7 @@ function CaptionForm({
           <span className="font-medium">No caption here</span>
         </label>
       </fieldset>
-      <div className="-mx-2 px-2 pt-2 border-t flex justify-end gap-2">
+      <div className="-mx-2 flex justify-end gap-2 border-t px-2 pt-2">
         <Button onClick={on_close}>Cancel</Button>
         <Button type="submit" variant="success">
           <SaveIcon strokeWidth={1.5} size={16} />

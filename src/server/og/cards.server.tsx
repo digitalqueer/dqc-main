@@ -3,8 +3,9 @@
 //
 // A card's text comes from the page's path, never from the request, so the
 // endpoint can't be used to put arbitrary words on the site's cards. It's the
-// page's breadcrumbs (PAGE_CRUMBS), with the crumbs that depend on the page
-// (a post's title, ...) looked up from published content only.
+// page's breadcrumbs: the labels routes set in `staticData.breadcrumb`, with
+// the labels that depend on the page (a post's title, ...) looked up here
+// from published content only.
 import type { getRouter } from "@/router";
 import { SITE_NAME } from "../../lib/share";
 import { db } from "../database/index.server";
@@ -36,23 +37,16 @@ const HOME_TITLE = "Building an Infrastructure for Change";
 /** Routes that never get a card: the admin pages, the APIs, and the cards. */
 const NO_CARD_ROUTE_PREFIXES = ["/_authenticated", "/api", "/og"];
 
-/** The last crumb, if found: e.g. a post's title, or nothing if it's a draft. */
-const withPage = (section: string[], page: string | null | undefined) =>
-  page ? [...section, page] : section;
-
 /**
- * Each page's crumbs after Home, the last being the card's title, by route
- * id. Keep in step with the pages' breadcrumbs. A page that's missing gets
- * the home page's card. A crumb that isn't found (e.g. an unpublished post)
- * is left out, so the card shows the section instead.
+ * The labels of the routes whose crumb is a component (it reads the page's
+ * loader data in the browser), by route id. Keep in step with those routes.
+ * A label that isn't found (e.g. an unpublished post) is left out, so the
+ * card shows the section instead.
  */
-const PAGE_CRUMBS: Record<
+const PAGE_LABELS: Record<
   string,
-  (params: Record<string, string>) => Promise<string[]>
+  (params: Record<string, string>) => Promise<string | null | undefined>
 > = {
-  "/about": async () => ["About"],
-  "/login": async () => ["Sign In"],
-  "/projects/": async () => ["Projects"],
   "/projects/$slug": async ({ slug }) => {
     const projects = new ProjectsRepository(db);
     const [project, page] = await Promise.all([
@@ -60,21 +54,12 @@ const PAGE_CRUMBS: Record<
       projects.getProjectPage(slug),
     ]);
     // Same rule as the page: only a published page is there to share.
-    return withPage(["Projects"], page?.publishedAt ? project?.name : null);
+    return page?.publishedAt ? project?.name : null;
   },
-  "/thoughts/": async () => ["Thoughts"],
   "/thoughts/$slug": async ({ slug }) =>
-    withPage(
-      ["Thoughts"],
-      (await new PostsRepository(db).getPublishedPost("thought", slug))?.title,
-    ),
-  // Statements sit under About (see routes/statements/$slug.tsx).
+    (await new PostsRepository(db).getPublishedPost("thought", slug))?.title,
   "/statements/$slug": async ({ slug }) =>
-    withPage(
-      ["About"],
-      (await new PostsRepository(db).getPublishedPost("statement", slug))
-        ?.title,
-    ),
+    (await new PostsRepository(db).getPublishedPost("statement", slug))?.title,
 };
 
 type Router = ReturnType<typeof getRouter>;
@@ -100,7 +85,16 @@ async function crumbsFor(path: string) {
     NO_CARD_ROUTE_PREFIXES.some((prefix) => route.id.startsWith(prefix)),
   );
   if (is_excluded) return null;
-  return (await PAGE_CRUMBS[found.id]?.(params)) ?? [];
+  const crumbs: string[] = [];
+  // Every page's first crumb is Home; the card's brand already says that.
+  for (const route of routes.slice(1)) {
+    const crumb = route.options.staticData?.breadcrumb;
+    if (!crumb) continue;
+    const label =
+      typeof crumb === "string" ? crumb : await PAGE_LABELS[route.id]?.(params);
+    if (label) crumbs.push(label);
+  }
+  return crumbs;
 }
 
 /** What the card for `path` says, or null when it has none. */
@@ -112,10 +106,11 @@ export async function shareCardContent(
   if (!crumbs) return null;
   const brand = SITE_NAME;
   const host = new URL(resolveSiteOrigin(request_url)).host;
-  if (crumbs.length === 0) {
+  const title = crumbs.at(-1);
+  if (title === undefined) {
     return { brand, host, section: [], title: HOME_TITLE };
   }
-  return { brand, host, section: crumbs.slice(0, -1), title: crumbs.at(-1)! };
+  return { brand, host, section: crumbs.slice(0, -1), title };
 }
 
 /** Recently drawn cards by ETag, so repeat requests skip the drawing. */
@@ -139,9 +134,9 @@ export async function shareCardResponse(request: Request, path: string) {
       CARD_WIDTH,
       CARD_HEIGHT,
     );
-    if (drawn.size >= DRAWN_LIMIT) {
-      drawn.delete(drawn.keys().next().value!);
-    }
+    // A Map keeps insertion order, so the first key is the oldest.
+    const oldest = drawn.keys().next().value;
+    if (drawn.size >= DRAWN_LIMIT && oldest !== undefined) drawn.delete(oldest);
     drawn.set(etag, body);
   }
   return new Response(body as BodyInit, {

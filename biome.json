@@ -1,13 +1,20 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.8/schema.json",
   "vcs": {
-    "enabled": false,
+    "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": false
+    "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false,
-    "includes": ["src/**", ".vscode/*", "index.html", "vite.config.js"]
+    "ignoreUnknown": true,
+    "includes": [
+      "src/**",
+      "!src/routeTree.gen.ts",
+      "docker/**",
+      "vite.config.ts",
+      "drizzle.config.ts",
+      "biome.json"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -26,15 +33,11 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "nursery": {
-        "useSortedClasses": {
+        "useTailwindSortedClasses": {
           "level": "info",
-          "fix": "safe",
-          "options": {
-            "attributes": ["classList"],
-            "functions": ["clsx", "cva", "tw", "tw.*"]
-          }
+          "fix": "safe"
         }
       }
     }
@@ -43,5 +46,15 @@
     "formatter": {
       "quoteStyle": "double"
     }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "tailwind": {
+    "attributes": ["class", "className", "classList"],
+    "mergeFunctions": ["cn", "clsx", "tw"],
+    "variantFunctions": ["cva"]
   }
 }

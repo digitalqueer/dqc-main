@@ -8,6 +8,7 @@ import { pageMeta } from "@/lib/share";
 import { getPublishedTeam } from "@/server/functions/team.functions";
 
 export const Route = createFileRoute("/about")({
+  staticData: { breadcrumb: "About" },
   // Everyone with a published bio, in the order set on the admin Team page.
   loader: () => getPublishedTeam(),
   head: () => ({
@@ -69,8 +70,11 @@ function RouteComponent() {
           community expertise, and strengthen collective digital power across
           the queer justice ecosystem. To learn more about our collaborative web
           development fellowship program with our sister organization DQC3, take
-          a look at DQC3’s fellowship page{" "}
-          <a href="https://dqc3.org/impact-fellowship">here</a>.
+          a look at{" "}
+          <a href="https://dqc3.org/impact-fellowship">
+            DQC3’s fellowship page
+          </a>
+          .
         </p>
         <h4>Digital Resistance &amp; Civic Imagination</h4>
         <p>

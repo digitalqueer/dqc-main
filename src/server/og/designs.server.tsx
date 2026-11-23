@@ -36,6 +36,7 @@ function titleSize(title: string) {
 function Chevron() {
   return (
     <svg
+      aria-hidden="true"
       width="28"
       height="28"
       viewBox="0 0 24 24"
@@ -97,7 +98,7 @@ export function ShareCard({ brand, host, section, title }: ShareCardContent) {
           >
             {section.map((crumb, index) => (
               <div
-                key={index}
+                key={crumb}
                 style={{ display: "flex", alignItems: "center", gap: 14 }}
               >
                 {index > 0 && <Chevron />}

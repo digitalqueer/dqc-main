@@ -210,8 +210,7 @@ export function toPublishStatus(
     isPublished: row?.publishedContent != null,
     hasUnpublishedChanges:
       row?.draftContent != null &&
-      JSON.stringify(row.draftContent) !==
-        JSON.stringify(row.publishedContent),
+      JSON.stringify(row.draftContent) !== JSON.stringify(row.publishedContent),
   };
 }
 

@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-router";
 import { ArrowLeftIcon, ArrowRightIcon, ImageUpIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
-import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Button from "@/components/_ui/Button";
 import Dialog from "@/components/_ui/Dialog";
 import Link from "@/components/_ui/Link";
@@ -23,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { getMediaLibrary } from "@/server/functions/media.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/media/")({
+  staticData: { breadcrumb: "Media" },
   validateSearch: mediaLibrarySearchSchema,
   // Keeps "?page=1" out of URLs.
   search: { middlewares: [stripSearchParams({ page: 1 })] },
@@ -65,7 +65,7 @@ function TagFilterLink({
 
 function SetupNotice({ title, missing }: { title: string; missing: string[] }) {
   return (
-    <div className="border border-yellow-700 bg-yellow-950/40 p-3 text-sm flex flex-col gap-1">
+    <div className="flex flex-col gap-1 border border-yellow-700 bg-yellow-950/40 p-3 text-sm">
       <p className="font-medium">{title}</p>
       <p>
         Set{" "}
@@ -82,8 +82,7 @@ function SetupNotice({ title, missing }: { title: string; missing: string[] }) {
 }
 
 function RouteComponent() {
-  const { items, total, page, page_count, tags, setup } =
-    Route.useLoaderData();
+  const { items, total, page, page_count, tags, setup } = Route.useLoaderData();
   const { tag } = Route.useSearch();
   const router = useRouter();
   const [selected_id, set_selected_id] = useState<string | null>(null);
@@ -99,9 +98,6 @@ function RouteComponent() {
 
   return (
     <Main>
-      <BreadcrumbNav current_page_label="Media">
-        <BreadcrumbItem to="/dashboard">Dashboard</BreadcrumbItem>
-      </BreadcrumbNav>
       {!setup.can_upload && (
         <SetupNotice
           title="Uploads are off: media storage isn't configured."
@@ -133,7 +129,7 @@ function RouteComponent() {
                 <button
                   type="button"
                   onClick={() => set_is_upload_open(true)}
-                  className="text-sm underline underline-offset-2 opacity-80 hover:opacity-100 cursor-pointer"
+                  className="cursor-pointer text-sm underline underline-offset-2 opacity-80 hover:opacity-100"
                 >
                   {activity_label}
                 </button>
@@ -223,7 +219,7 @@ function RouteComponent() {
       >
         {/* Stays mounted while closed, so uploads carry on in the background. */}
         <Dialog.Content className="max-w-2xl gap-4">
-          <div className="-mx-2 px-2 pb-2 pr-12 border-b">
+          <div className="-mx-2 border-b px-2 pr-12 pb-2">
             <h2 className="text-2xl font-bold">Upload Images</h2>
             <p className="text-sm opacity-80">
               Uploads keep going if you close this.

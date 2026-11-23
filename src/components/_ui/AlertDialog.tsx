@@ -107,7 +107,7 @@ export function AlertDialog({
       className={cn(
         "fixed inset-0 z-50 m-auto h-fit w-[calc(100%-2rem)] max-w-md border p-4",
         "bg-neutral-950 text-neutral-100",
-        "hidden open:flex flex-col gap-4",
+        "hidden flex-col gap-4 open:flex",
         "backdrop:bg-neutral-900/75",
       )}
     >
@@ -117,7 +117,7 @@ export function AlertDialog({
       {description && (
         <div
           id={description_id}
-          className="flex flex-col gap-2 text-sm text-neutral-300 break-words"
+          className="flex flex-col gap-2 text-sm break-words text-neutral-300"
         >
           {typeof description === "string" ? <p>{description}</p> : description}
         </div>

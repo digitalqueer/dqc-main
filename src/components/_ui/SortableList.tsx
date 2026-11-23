@@ -159,7 +159,11 @@ export function SortableList<T extends { id: string }>({
         return;
       }
       const to =
-        e.key === "ArrowUp" ? index - 1 : e.key === "ArrowDown" ? index + 1 : -1;
+        e.key === "ArrowUp"
+          ? index - 1
+          : e.key === "ArrowDown"
+            ? index + 1
+            : -1;
       if (to < 0 || to >= shown.length) return;
       e.preventDefault();
       refocus_id.current = item.id;
@@ -187,7 +191,9 @@ export function SortableList<T extends { id: string }>({
   };
 
   return (
-    <div className={cn("flex flex-col gap-4", drag && "select-none", className)}>
+    <div
+      className={cn("flex flex-col gap-4", drag && "select-none", className)}
+    >
       {shown.map((item, k) => (
         <div
           key={item.id}
@@ -200,11 +206,14 @@ export function SortableList<T extends { id: string }>({
           }}
           // Transitions only while dragging, so the drop snaps into the new DOM order.
           className={cn(
-            drag && k !== drag.index && "motion-safe:transition-transform duration-150",
-            drag?.index === k &&
-              "relative z-10 bg-neutral-900 shadow-lg",
+            drag &&
+              k !== drag.index &&
+              "duration-150 motion-safe:transition-transform",
+            drag?.index === k && "relative z-10 bg-neutral-900 shadow-lg",
           )}
-          style={drag ? { transform: `translateY(${offset_for(k)}px)` } : undefined}
+          style={
+            drag ? { transform: `translateY(${offset_for(k)}px)` } : undefined
+          }
         >
           {render_item(item, handle_props(item, k))}
         </div>

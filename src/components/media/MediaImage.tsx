@@ -8,10 +8,11 @@ export interface ResponsiveImageSource {
   height: number | null;
 }
 
-interface MediaImageProps extends Omit<
-  ComponentProps<"img">,
-  "src" | "srcSet" | "sizes" | "width" | "height" | "alt"
-> {
+interface MediaImageProps
+  extends Omit<
+    ComponentProps<"img">,
+    "src" | "srcSet" | "sizes" | "width" | "height" | "alt"
+  > {
   image: ResponsiveImageSource;
   /** Describe the image; pass "" only when it's purely decorative. */
   alt: string;

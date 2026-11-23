@@ -1,16 +1,15 @@
-import { Prettify } from "@/lib/utils";
+import type { Placement } from "@floating-ui/react";
 import { ClientOnly } from "@tanstack/react-router";
-import { Placement } from "@floating-ui/react";
 import {
   AlertTriangleIcon,
   CheckIcon,
-  LucideIcon,
+  type LucideIcon,
   OctagonXIcon,
   XIcon,
 } from "lucide-react";
 import {
   createContext,
-  ReactNode,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -22,6 +21,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { v7 as uuidv7 } from "uuid";
+import type { Prettify } from "@/lib/utils";
 import Button from "./Button";
 
 type ToastType = "basic" | "success" | "warning" | "danger";
@@ -52,10 +52,7 @@ function Toast({ onDismiss, toast }: ToastProps) {
   }, [toast.type]);
 
   return (
-    <output
-      role="status"
-      className="block pointer-events-none border bg-neutral-950 p-2 w-full"
-    >
+    <output className="pointer-events-none block w-full border bg-neutral-950 p-2">
       <div className="flex items-center gap-2">
         {Icon && <Icon className="size-4 shrink-0" />}
         <span className="grow">{toast.title}</span>
@@ -68,7 +65,7 @@ function Toast({ onDismiss, toast }: ToastProps) {
         </Button>
       </div>
       {toast.description && (
-        <p className="text-sm text-neutral-300 mt-2">{toast.description}</p>
+        <p className="mt-2 text-sm text-neutral-300">{toast.description}</p>
       )}
     </output>
   );
@@ -116,6 +113,7 @@ function ToastContainer({ onDismiss, toasts }: ToastContainerProps) {
   // above a modal <dialog> and its backdrop. Putting them inside the open
   // modal keeps them clickable and announced too (see useOpenModalDialog).
   // Showing the popover again moves it above anything opened since.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `modal` isn't read, but a modal opening or closing has to re-show the popover so it stays on top.
   useLayoutEffect(() => {
     const container = ref.current;
     if (!container) return;
@@ -129,7 +127,7 @@ function ToastContainer({ onDismiss, toasts }: ToastContainerProps) {
       popover="manual"
       aria-label="Notifications"
       // Undoes the popover's default look (centered, bordered, Canvas colors).
-      className="hidden open:flex fixed inset-x-0 top-0 bottom-auto mx-auto h-fit w-full max-w-sm flex-col gap-2 overflow-visible bg-transparent p-2 text-neutral-100 pointer-events-none"
+      className="pointer-events-none fixed inset-x-0 top-0 bottom-auto mx-auto hidden h-fit w-full max-w-sm flex-col gap-2 overflow-visible bg-transparent p-2 text-neutral-100 open:flex"
     >
       {toasts.map((toast) => (
         <Toast
@@ -186,7 +184,7 @@ function ToastProvider({ children, placement }: ToastProviderProps) {
       const toast = { id: uuidv7(), type, ...data };
       dispatch({ type: "add-toast", data: toast });
       setTimeout(() => {
-        handleDismissToast(toast.id);
+        dispatch({ type: "dismiss-toast", data: { id: toast.id } });
       }, toast.ttl ?? 10_000);
     },
     [],

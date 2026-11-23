@@ -93,13 +93,7 @@ export class TeamRepository {
   public async reorderTeamMembers(ids: string[]) {
     if (!ids.length) return;
     await this.db.execute(
-      buildReorderQuery(
-        teamMember,
-        teamMember.id,
-        ids,
-        undefined,
-        "uuid",
-      ),
+      buildReorderQuery(teamMember, teamMember.id, ids, undefined, "uuid"),
     );
   }
 

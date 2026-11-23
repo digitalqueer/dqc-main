@@ -32,7 +32,6 @@ import {
   type TextFormatType,
   UNDO_COMMAND,
 } from "lexical";
-import { toRichTextHeadingTag } from "@/lib/rich-text";
 import {
   BoldIcon,
   CodeIcon,
@@ -44,6 +43,7 @@ import {
   Undo2Icon,
 } from "lucide-react";
 import { type KeyboardEvent, useEffect, useState } from "react";
+import { toRichTextHeadingTag } from "@/lib/rich-text";
 import { cn } from "@/lib/utils";
 import Button from "../_ui/Button";
 import { Select } from "../_ui/Select";
@@ -145,10 +145,9 @@ const TOOLBAR_BUTTON_ACTIVE = "border-white bg-neutral-800";
 
 function Separator() {
   return (
-    <div
-      role="separator"
+    <hr
       aria-orientation="vertical"
-      className="mx-1 h-6 w-px bg-neutral-700"
+      className="mx-1 h-6 w-px border-0 bg-neutral-700"
     />
   );
 }

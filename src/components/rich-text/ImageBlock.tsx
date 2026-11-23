@@ -111,8 +111,7 @@ export function ImageBlock({ node_key, media_id, caption }: ImageBlockProps) {
     editor.focus();
   }, [editor, node_key]);
 
-  const outline =
-    is_selected && "outline-2 outline-offset-4 outline-white";
+  const outline = is_selected && "outline-2 outline-offset-4 outline-white";
   const remove_button = <Button onClick={remove}>Remove</Button>;
 
   let content: ReactNode;

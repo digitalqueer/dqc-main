@@ -52,8 +52,11 @@ function RouteComponent() {
 
   return (
     <Main>
-      <nav aria-label="Admin" className="flex flex-wrap items-center gap-2 w-full">
-        <h2 className="text-2xl font-semibold mr-auto">Dashboard</h2>
+      <nav
+        aria-label="Admin"
+        className="flex w-full flex-wrap items-center gap-2"
+      >
+        <h2 className="mr-auto text-2xl font-semibold">Dashboard</h2>
         <Link to="/dashboard/media">
           <ImagesIcon strokeWidth={1.5} size={16} aria-hidden />
           <span>Media Library</span>
@@ -77,7 +80,12 @@ function RouteComponent() {
       <section className="flex flex-col gap-4">
         <h2 className="text-2xl font-semibold text-neutral-300 hover:underline">
           <TanstackLink to="/dashboard/requests">
-            <MailIcon strokeWidth={1.5} size={20} aria-hidden className="inline mr-2 -mt-1" />
+            <MailIcon
+              strokeWidth={1.5}
+              size={20}
+              aria-hidden
+              className="-mt-1 mr-2 inline"
+            />
             Contact Requests
           </TanstackLink>
         </h2>
@@ -99,7 +107,7 @@ function RouteComponent() {
             ))}
           </ul>
         ) : (
-          <p className="italic text-neutral-300">No new requests</p>
+          <p className="text-neutral-300 italic">No new requests</p>
         )}
         <Link to="/dashboard/requests">
           <InboxIcon strokeWidth={1.5} size={16} aria-hidden />
@@ -110,7 +118,12 @@ function RouteComponent() {
       <section className="flex flex-col gap-4">
         <h2 className="text-2xl font-semibold text-neutral-300 hover:underline">
           <TanstackLink to="/dashboard/posts">
-            <RssIcon strokeWidth={1.5} size={20} aria-hidden className="inline mr-2 -mt-1" />
+            <RssIcon
+              strokeWidth={1.5}
+              size={20}
+              aria-hidden
+              className="-mt-1 mr-2 inline"
+            />
             Thoughts &amp; Statements
           </TanstackLink>
         </h2>
@@ -122,7 +135,7 @@ function RouteComponent() {
             ))}
           </ul>
         ) : (
-          <p className="italic text-neutral-300">No posts yet</p>
+          <p className="text-neutral-300 italic">No posts yet</p>
         )}
         <Link to="/dashboard/posts">
           <FilesIcon strokeWidth={1.5} size={16} aria-hidden />
@@ -133,7 +146,12 @@ function RouteComponent() {
       <section className="flex flex-col gap-4">
         <h2 className="text-2xl font-semibold text-neutral-300 hover:underline">
           <TanstackLink to="/dashboard/projects">
-            <HammerIcon strokeWidth={1.5} size={20} aria-hidden className="inline mr-2 -mt-1" />
+            <HammerIcon
+              strokeWidth={1.5}
+              size={20}
+              aria-hidden
+              className="-mt-1 mr-2 inline"
+            />
             Projects
           </TanstackLink>
         </h2>
@@ -143,12 +161,14 @@ function RouteComponent() {
             {active_projects.map((project) => (
               <li
                 key={project.id}
-                className="border border-neutral-700 flex items-start gap-4 p-2"
+                className="flex items-start gap-4 border border-neutral-700 p-2"
               >
-                <div className="flex flex-col flex-1 min-w-0">
+                <div className="flex min-w-0 flex-1 flex-col">
                   <p className="text-sm text-neutral-300">
                     {projectDates(project)} ·{" "}
-                    {project.hasPublishedPage ? "Page published" : "No page yet"}
+                    {project.hasPublishedPage
+                      ? "Page published"
+                      : "No page yet"}
                   </p>
                   <p className="font-medium">
                     <TanstackLink
@@ -164,7 +184,7 @@ function RouteComponent() {
             ))}
           </ul>
         ) : (
-          <p className="italic text-neutral-300">No active projects to show</p>
+          <p className="text-neutral-300 italic">No active projects to show</p>
         )}
         <Link to="/dashboard/projects">
           <FoldersIcon strokeWidth={1.5} size={16} aria-hidden />
@@ -175,7 +195,12 @@ function RouteComponent() {
       <section className="flex flex-col gap-4">
         <h2 className="text-2xl font-semibold text-neutral-300 hover:underline">
           <TanstackLink to="/dashboard/team">
-            <UsersIcon strokeWidth={1.5} size={20} aria-hidden className="inline mr-2 -mt-1" />
+            <UsersIcon
+              strokeWidth={1.5}
+              size={20}
+              aria-hidden
+              className="-mt-1 mr-2 inline"
+            />
             Team
           </TanstackLink>
         </h2>
@@ -184,9 +209,9 @@ function RouteComponent() {
             {team.map((member) => (
               <li
                 key={member.id}
-                className="border border-neutral-700 flex items-start gap-4 p-2"
+                className="flex items-start gap-4 border border-neutral-700 p-2"
               >
-                <div className="flex flex-col flex-1 min-w-0">
+                <div className="flex min-w-0 flex-1 flex-col">
                   <p className="text-sm text-neutral-300">
                     {member.status.isPublished
                       ? member.status.hasUnpublishedChanges
@@ -203,7 +228,7 @@ function RouteComponent() {
                       {member.name}
                     </TanstackLink>
                     {member.pronouns && (
-                      <span className="text-neutral-300 font-normal text-sm">
+                      <span className="text-sm font-normal text-neutral-300">
                         {" "}
                         {member.pronouns}
                       </span>
@@ -214,7 +239,7 @@ function RouteComponent() {
             ))}
           </ul>
         ) : (
-          <p className="italic text-neutral-300">No one on the team yet</p>
+          <p className="text-neutral-300 italic">No one on the team yet</p>
         )}
         <Link to="/dashboard/team">
           <UsersIcon strokeWidth={1.5} size={16} aria-hidden />

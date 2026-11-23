@@ -22,7 +22,7 @@ export function FormActions({
   const [is_deleting, set_is_deleting] = useState(false);
 
   return (
-    <div className="-mx-2 px-2 pt-2 border-t flex items-center gap-2">
+    <div className="-mx-2 flex items-center gap-2 border-t px-2 pt-2">
       {on_delete && (
         <Button
           variant="danger"
@@ -46,7 +46,8 @@ export function FormActions({
       </Button>
       <form.Subscribe
         selector={(state) => [state.canSubmit, state.isSubmitting] as const}
-        children={([can_submit, is_submitting]) => (
+      >
+        {([can_submit, is_submitting]) => (
           <Button
             type="submit"
             loading={is_submitting}
@@ -56,7 +57,7 @@ export function FormActions({
             {submit_icon}
           </Button>
         )}
-      />
+      </form.Subscribe>
     </div>
   );
 }
