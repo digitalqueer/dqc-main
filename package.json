@@ -16,6 +16,8 @@
     "migrate": "npx drizzle-kit migrate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1173.0",
+    "@aws-sdk/s3-request-presigner": "^3.1173.0",
     "@base-ui-components/react": "^1.0.0-beta.3",
     "@floating-ui/react": "^0.27.20",
     "@lexical/code": "^0.53.0",
@@ -27,6 +29,7 @@
     "@lexical/rich-text": "^0.53.0",
     "@lexical/selection": "^0.53.0",
     "@lexical/utils": "^0.53.0",
+    "@resvg/resvg-wasm": "^2.6.2",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-devtools": "^0.10.12",
@@ -46,6 +49,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "resend": "^6.9.2",
+    "satori": "^0.63.2",
     "slugify": "^1.6.9",
     "tailwind-merge": "^3.7.0",
     "tailwindcss": "^4.3.3",

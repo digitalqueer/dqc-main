@@ -6,13 +6,14 @@ import Link from "@/components/_ui/Link";
 import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
 import { projectDates } from "@/lib/projects";
+import { pageMeta } from "@/lib/share";
 import { cn } from "@/lib/utils";
 import { listPublicProjects } from "@/server/functions/projects.functions";
 
 export const Route = createFileRoute("/projects/")({
   loader: () => listPublicProjects(),
   head: () => ({
-    meta: [{ title: "Projects - Digital Queer Collective" }],
+    meta: pageMeta({ title: "Projects" }),
   }),
   component: RouteComponent,
 });

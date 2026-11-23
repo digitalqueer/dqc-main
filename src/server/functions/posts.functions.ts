@@ -14,7 +14,9 @@ import {
   postUpdateSchema,
 } from "@/lib/posts";
 import { hasRichTextContent } from "@/lib/rich-text";
+import { resolveRichTextMedia } from "@/server/media/rich-text-media.server";
 import { ensure_auth_middleware } from "@/server/middleware/auth.middleware";
+import { media_middleware } from "@/server/middleware/media.middleware";
 import { posts_middleware } from "@/server/middleware/posts.middleware";
 
 // <-- Public: published posts only -->
@@ -25,18 +27,19 @@ export const listPublishedThoughts = createServerFn({ method: "GET" })
   .handler(({ context }) => context.posts.listPublishedPosts("thought"));
 
 /**
- * /thoughts/{slug} and /statements/{slug}: the post and its published
- * content. Drafts are never sent.
+ * /thoughts/{slug} and /statements/{slug}: the post, its published content,
+ * and the images that content shows. Drafts are never sent.
  */
 export const getPublishedPost = createServerFn({ method: "GET" })
-  .middleware([posts_middleware])
+  .middleware([posts_middleware, media_middleware])
   .validator(postSlugSchema.extend({ kind: z.enum(POST_KINDS) }))
   .handler(async ({ context, data }) => {
     const row = await context.posts.getPublishedPost(data.kind, data.slug);
     if (!row) throw notFound();
     const { content, publishedAt, ...post } = row;
     if (!content || !publishedAt) throw notFound();
-    return { post: { ...post, publishedAt }, content };
+    const media = await resolveRichTextMedia(context.media, [content]);
+    return { post: { ...post, publishedAt }, content, media };
   });
 
 // <-- Admin -->

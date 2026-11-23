@@ -3,6 +3,7 @@ import { BreadcrumbItem, BreadcrumbNav } from "@/components/_ui/BreadcrumbNav";
 import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
 import { RichTextRenderer } from "@/components/rich-text/RichTextRenderer";
+import { pageMeta } from "@/lib/share";
 import { getPublishedProjectPage } from "@/server/functions/projects.functions";
 
 export const Route = createFileRoute("/projects/$slug")({
@@ -11,19 +12,17 @@ export const Route = createFileRoute("/projects/$slug")({
   head: ({ loaderData }) =>
     loaderData
       ? {
-          meta: [
-            { title: `${loaderData.project.name} - Digital Queer Collective` },
-            ...(loaderData.project.description
-              ? [{ name: "description", content: loaderData.project.description }]
-              : []),
-          ],
+          meta: pageMeta({
+            title: loaderData.project.name,
+            description: loaderData.project.description,
+          }),
         }
       : {},
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { project, content } = Route.useLoaderData();
+  const { project, content, media } = Route.useLoaderData();
 
   return (
     <Main>
@@ -34,6 +33,7 @@ function RouteComponent() {
         {/* Wrapped, so prose's no-margin-on-the-first-child rule needs repeating. */}
         <RichTextRenderer
           document={content}
+          media={media}
           className="rich-text [&>:first-child]:mt-0"
         />
       </Prose>

@@ -21,6 +21,13 @@ import {
   toRichTextHeadingTag,
 } from "@/lib/rich-text";
 import { cn } from "@/lib/utils";
+import { ImageActionsProvider } from "./ImageActions";
+import { ImageNode, ImagesPlugin } from "./ImageNode";
+import {
+  type MediaViewStore,
+  MediaViewStoreProvider,
+  useCreateMediaViewStore,
+} from "./mediaViewStore";
 import { RICH_TEXT_CLASSES, RICH_TEXT_PROSE } from "./richTextClasses";
 import { RICH_TEXT_NODES, RICH_TEXT_TRANSFORMERS } from "./richTextNodes";
 import { RichTextToolbar } from "./RichTextToolbar";
@@ -93,6 +100,11 @@ interface RichTextEditorProps {
   /** Accessible name for the writing area. */
   label: string;
   placeholder?: string;
+  /**
+   * Where the document's images are looked up. Pass one shared with a
+   * preview (useRichTextMediaMap); by default the editor keeps its own.
+   */
+  media_store?: MediaViewStore;
   className?: string;
 }
 
@@ -101,13 +113,17 @@ export function RichTextEditor({
   on_change,
   label,
   placeholder = "Start writing…",
+  media_store,
   className,
 }: RichTextEditorProps) {
   const content_id = useId();
+  const own_media_store = useCreateMediaViewStore();
   // Built once: LexicalComposer only reads its config on the first render.
   const [initial_config] = useState<InitialConfigType>(() => ({
     namespace: "RichTextEditor",
-    nodes: RICH_TEXT_NODES,
+    // Images render with React, so they're added here rather than in
+    // RICH_TEXT_NODES (which headless scripts load).
+    nodes: [...RICH_TEXT_NODES, ImageNode],
     theme: THEME,
     onError: (error) => console.error(error),
     // An empty root has no paragraph to type into; let Lexical create one.
@@ -118,43 +134,48 @@ export function RichTextEditor({
 
   return (
     <LexicalComposer initialConfig={initial_config}>
-      <div
-        className={cn(
-          "flex flex-col border border-neutral-700 focus-within:border-white transition-colors",
-          className,
-        )}
-      >
-        <RichTextToolbar
-          controls={content_id}
-          className="border-b border-neutral-700"
-        />
-        <div className="relative">
-          <RichTextPlugin
-            contentEditable={
-              <ContentEditable
-                id={content_id}
-                aria-label={label}
-                aria-placeholder={placeholder}
-                placeholder={
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute top-4 left-4 select-none opacity-60"
-                  >
-                    {placeholder}
-                  </div>
+      <MediaViewStoreProvider value={media_store ?? own_media_store}>
+        <ImageActionsProvider>
+          <div
+            className={cn(
+              "flex flex-col border border-neutral-700 focus-within:border-white transition-colors",
+              className,
+            )}
+          >
+            <RichTextToolbar
+              controls={content_id}
+              className="border-b border-neutral-700"
+            />
+            <div className="relative">
+              <RichTextPlugin
+                contentEditable={
+                  <ContentEditable
+                    id={content_id}
+                    aria-label={label}
+                    aria-placeholder={placeholder}
+                    placeholder={
+                      <div
+                        aria-hidden
+                        className="pointer-events-none absolute top-4 left-4 select-none opacity-60"
+                      >
+                        {placeholder}
+                      </div>
+                    }
+                    className={cn(RICH_TEXT_PROSE, "min-h-96 p-4 outline-none")}
+                  />
                 }
-                className={cn(RICH_TEXT_PROSE, "min-h-96 p-4 outline-none")}
+                ErrorBoundary={LexicalErrorBoundary}
               />
-            }
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-        </div>
-      </div>
+            </div>
+          </div>
+        </ImageActionsProvider>
+      </MediaViewStoreProvider>
       <HistoryPlugin />
       <ListPlugin />
       <LinkPlugin validateUrl={isSafeUrl} />
       <MarkdownShortcutPlugin transformers={RICH_TEXT_TRANSFORMERS} />
       <HeadingLevelPlugin />
+      <ImagesPlugin />
       <ChangePlugin on_change={on_change} />
     </LexicalComposer>
   );

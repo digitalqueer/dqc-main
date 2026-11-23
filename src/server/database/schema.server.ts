@@ -13,6 +13,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { v7 as uuidv7 } from "uuid";
+import { MEDIA_STATUSES } from "../../lib/media";
 import { POST_KINDS } from "../../lib/posts";
 import type { RichTextDocument } from "../../lib/rich-text";
 
@@ -236,6 +237,45 @@ export const teamMember = pgTable("team_member", {
 });
 export type TeamMember = typeof teamMember.$inferSelect;
 
+// <-- Media -->
+// Images uploaded to the media library. The files are in the S3 bucket;
+// rich-text documents refer to them by id (see lib/rich-text.ts).
+export const media = pgTable(
+  "media",
+  {
+    // The upload sets it, so the object key (media/{id}.jpg) can use it.
+    id: uuid("id")
+      .primaryKey()
+      .$default(() => uuidv7()),
+    /** Object key in the bucket, e.g. "media/{id}.jpg". */
+    storageKey: text("storage_key").notNull().unique(),
+    status: text("status", { enum: MEDIA_STATUSES }).notNull().default("pending"),
+    /** The uploaded file's name, for display only. */
+    originalName: text("original_name").notNull(),
+    contentType: text("content_type").notNull(),
+    byteSize: integer("byte_size").notNull(),
+    /** As displayed (after EXIF rotation); null when the browser couldn't decode it. */
+    width: integer("width"),
+    height: integer("height"),
+    altText: text("alt_text"),
+    caption: text("caption"),
+    /** Lowercase, without "#" (see tagList). */
+    tags: text("tags").array().notNull().default([]),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("media_status_created_at_idx").on(table.status, table.createdAt),
+    // Serves the library's tag filter (`tags @> '{tag}'`).
+    index("media_tags_idx").using("gin", table.tags),
+  ],
+);
+export type Media = typeof media.$inferSelect;
+export type NewMedia = typeof media.$inferInsert;
+
 // <-- Relations -->
 export const schema = {
   user,
@@ -247,4 +287,5 @@ export const schema = {
   project,
   projectPage,
   teamMember,
+  media,
 } as const;

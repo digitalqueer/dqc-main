@@ -1,15 +1,17 @@
 import { createFileRoute, Link as TanstackLink } from "@tanstack/react-router";
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, RssIcon } from "lucide-react";
 import Link from "@/components/_ui/Link";
 import Main from "@/components/_ui/Main";
 import Prose from "@/components/_ui/Prose";
 import { PublishedDate } from "@/components/_ui/PublishedDate";
+import { THOUGHTS_FEED_PATH } from "@/lib/posts";
+import { pageMeta } from "@/lib/share";
 import { listPublishedThoughts } from "@/server/functions/posts.functions";
 
 export const Route = createFileRoute("/thoughts/")({
   loader: () => listPublishedThoughts(),
   head: () => ({
-    meta: [{ title: "Thoughts - Digital Queer Collective" }],
+    meta: pageMeta({ title: "Thoughts" }),
   }),
   component: RouteComponent,
 });
@@ -20,7 +22,18 @@ function RouteComponent() {
   return (
     <Main>
       <Prose>
-        <h2>Thoughts</h2>
+        {/* Prose's h2 margins go on the row (its first child loses the top one). */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <h2 className="my-0!">Thoughts</h2>
+          <Link
+            href={THOUGHTS_FEED_PATH}
+            type="application/rss+xml"
+            className="-mr-3"
+          >
+            <RssIcon strokeWidth={1.5} className="size-4" aria-hidden />
+            <span>RSS Feed</span>
+          </Link>
+        </div>
         {thoughts.length === 0 && <p className="italic">Nothing here yet.</p>}
         {thoughts.map((thought) => {
           const summary = thought.description ?? thought.excerpt;

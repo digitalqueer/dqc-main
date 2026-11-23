@@ -9,18 +9,30 @@ import {
   teamMemberUpdateSchema,
   teamReorderSchema,
 } from "@/lib/team";
+import { resolveRichTextMedia } from "@/server/media/rich-text-media.server";
 import { ensure_auth_middleware } from "@/server/middleware/auth.middleware";
+import { media_middleware } from "@/server/middleware/media.middleware";
 import { team_middleware } from "@/server/middleware/team.middleware";
 
 // <-- Public -->
 
-/** "Our Team" on /about: everyone with a published bio, in order. */
-export const listPublishedTeam = createServerFn({ method: "GET" })
-  .middleware([team_middleware])
+/**
+ * "Our Team" on /about: everyone with a published bio, in order, plus the
+ * images the bios show (one lookup for all of them).
+ */
+export const getPublishedTeam = createServerFn({ method: "GET" })
+  .middleware([team_middleware, media_middleware])
   .handler(async ({ context }) => {
     const rows = await context.team.listPublishedTeamMembers();
     // The query only returns published bios; this narrows the type.
-    return rows.flatMap(({ bio, ...member }) => (bio ? [{ ...member, bio }] : []));
+    const members = rows.flatMap(({ bio, ...member }) =>
+      bio ? [{ ...member, bio }] : [],
+    );
+    const media = await resolveRichTextMedia(
+      context.media,
+      members.map((member) => member.bio),
+    );
+    return { members, media };
   });
 
 // <-- Admin -->

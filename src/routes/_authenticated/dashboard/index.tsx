@@ -5,6 +5,7 @@ import {
   FoldersIcon,
   HammerIcon,
   HomeIcon,
+  ImagesIcon,
   InboxIcon,
   MailIcon,
   RssIcon,
@@ -53,6 +54,10 @@ function RouteComponent() {
     <Main>
       <nav aria-label="Admin" className="flex flex-wrap items-center gap-2 w-full">
         <h2 className="text-2xl font-semibold mr-auto">Dashboard</h2>
+        <Link to="/dashboard/media">
+          <ImagesIcon strokeWidth={1.5} size={16} aria-hidden />
+          <span>Media Library</span>
+        </Link>
         <Link
           href="https://analytics.dqc.dev/dqc.dev"
           target="_blank"

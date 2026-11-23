@@ -4,6 +4,7 @@
 // schema, which imports from here.
 import * as z from "zod";
 import { richTextDocumentSchema } from "./rich-text";
+import { SITE_NAME } from "./share";
 import { identifierSchema, optionalText, requiredText } from "./validation";
 
 /**
@@ -23,6 +24,13 @@ export const POST_KIND_PATHS: Record<PostKind, "/thoughts" | "/statements"> = {
   thought: "/thoughts",
   statement: "/statements",
 };
+
+/** The RSS feed of published thoughts (routes/rss[.]xml.ts). */
+export const THOUGHTS_FEED_PATH = "/rss.xml";
+/** How many of the newest thoughts the feed carries. */
+export const THOUGHTS_FEED_LIMIT = 20;
+/** The feed's name, shared by the feed itself and the <link> that advertises it. */
+export const THOUGHTS_FEED_TITLE = `${SITE_NAME} — Thoughts`;
 
 export const POST_TITLE_MAX_LENGTH = 200;
 export const POST_DESCRIPTION_MAX_LENGTH = 600;
