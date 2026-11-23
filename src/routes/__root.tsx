@@ -47,10 +47,6 @@ export const Route = createRootRoute({
         "data-domain": "dqc.dev",
         src: "https://analytics.dqc.dev/js/script.js",
       },
-      {
-        defer: true,
-        src: "https://challenges.cloudflare.com/turnstile/v0/api.js",
-      },
     ],
   }),
   shellComponent: RootDocument,

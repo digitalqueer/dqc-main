@@ -1,61 +1,76 @@
-import { useForm } from "@tanstack/react-form-start";
-import FieldInfo from "../_ui/FieldInfo";
-import { ComponentProps } from "react";
-import { cn } from "@/lib/utils";
-import { ClientOnly } from "@tanstack/react-router";
-import Turnstile from "react-turnstile";
+import { revalidateLogic, useForm } from "@tanstack/react-form-start";
+import { useServerFn } from "@tanstack/react-start";
+import { type ComponentProps, useRef, useState } from "react";
+import { Turnstile, type TurnstileHandle } from "@/components/Turnstile";
 import {
   CONTACT_TURNSTILE_ACTION,
-  NewContactRequestSchema,
-} from "@/schemas/contactRequest.schema";
-import { createContactRequestServerFn } from "@/server/contact/contact.functions";
+  type ContactRequestInput,
+  contactRequestInputSchema,
+} from "@/lib/contact";
+import { cn } from "@/lib/utils";
+import { submitContactRequest } from "@/server/functions/contact.functions";
+import FieldInfo from "../_ui/FieldInfo";
 import { useToast } from "../_ui/Toast";
-import type {
-  InvalidContactRequestReponse,
-  ValidContactRequestResponse,
-} from "@/server/contact/contact.server";
+
+const EMPTY: ContactRequestInput = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  comment: "",
+  communicationsConsent: false,
+};
 
 interface ContactFormProps
   extends Omit<ComponentProps<"form">, "id" | "onSubmit"> {
   id: string;
-  /** From getContactFormServerFn; null while Turnstile isn't configured. */
+  /** From getContactForm; null while Turnstile isn't configured. */
   turnstileSiteKey: string | null;
-  onValidResponse?: (response: ValidContactRequestResponse) => void;
-  onInvalidResponse?: (response: InvalidContactRequestReponse) => void;
+  /** Called once the message is saved, e.g. to close the dialog. */
+  onSent?: () => void;
 }
 
+/** The public contact form, behind a Turnstile check. */
 export function ContactForm({
   id,
   turnstileSiteKey,
-  onValidResponse,
-  onInvalidResponse,
+  onSent,
   ...props
 }: ContactFormProps) {
   const toast = useToast();
+  const submit = useServerFn(submitContactRequest);
+  const turnstile_ref = useRef<TurnstileHandle>(null);
+  const [token, set_token] = useState<string | null>(null);
+
   const form = useForm({
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      comment: "",
-      communicationsConsent: false,
-      turnstileToken: "",
-    },
-    validators: { onSubmit: NewContactRequestSchema },
-    onSubmit: async ({ value }) => {
-      const requestContactResponse = await createContactRequestServerFn({
-        data: value,
-      });
-      if (requestContactResponse.success) {
-        toast.success({ title: "Thanks for reaching out!" });
-        if (onValidResponse) onValidResponse(requestContactResponse);
-      } else {
-        console.error(
-          `Failed to submit contact request form - ${requestContactResponse.errors.join(", ")}`,
-        );
-        toast.danger({ title: "Something went wrong" });
-        if (onInvalidResponse) onInvalidResponse(requestContactResponse);
+    defaultValues: EMPTY,
+    // Quiet until the first send, then re-checks as they fix things.
+    validationLogic: revalidateLogic(),
+    validators: { onDynamic: contactRequestInputSchema },
+    onSubmit: async ({ value, formApi }) => {
+      if (!token) {
+        toast.danger({
+          title: "Wait for the check that you're human to finish, then send.",
+        });
+        return;
       }
+      try {
+        await submit({ data: { ...value, turnstileToken: token } });
+      } catch (reason) {
+        toast.danger({
+          title: "Your message wasn't sent",
+          description:
+            reason instanceof Error && reason.message
+              ? reason.message
+              : "Please try again.",
+        });
+        return;
+      } finally {
+        // A token passes once, sent or not, so ask for a new one.
+        turnstile_ref.current?.reset();
+      }
+      toast.success({ title: "Thanks for reaching out!" });
+      formApi.reset(EMPTY);
+      onSent?.();
     },
   });
 
@@ -191,22 +206,13 @@ export function ContactForm({
         )}
       />
       {turnstileSiteKey ? (
-        <ClientOnly>
-          <form.Field
-            name="turnstileToken"
-            children={(field) => (
-              <Turnstile
-                className="mt-2"
-                action={CONTACT_TURNSTILE_ACTION}
-                fixedSize
-                refreshExpired="auto"
-                size="normal"
-                sitekey={turnstileSiteKey}
-                onVerify={(token) => field.handleChange(token)}
-              />
-            )}
-          />
-        </ClientOnly>
+        <Turnstile
+          ref={turnstile_ref}
+          className="mt-2"
+          site_key={turnstileSiteKey}
+          action={CONTACT_TURNSTILE_ACTION}
+          on_token={set_token}
+        />
       ) : (
         <p className="mt-2 text-neutral-400 text-sm">
           The contact form isn't available right now. Please try again later.
